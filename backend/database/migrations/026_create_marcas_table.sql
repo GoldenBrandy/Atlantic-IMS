@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS marcas (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(80) NOT NULL,
+  code VARCHAR(30) NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  description VARCHAR(300),
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);

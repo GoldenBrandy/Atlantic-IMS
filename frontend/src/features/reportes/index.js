@@ -1,0 +1,1 @@
+export { default as ListReportesPage } from './pages/ListReportesPage';

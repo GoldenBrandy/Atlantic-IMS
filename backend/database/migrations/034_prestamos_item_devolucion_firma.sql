@@ -1,0 +1,7 @@
+ALTER TABLE prestamos
+  ADD COLUMN IF NOT EXISTS material_id INTEGER REFERENCES materiales(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS signature_url TEXT,
+  ADD COLUMN IF NOT EXISTS returned_at TIMESTAMP;
+
+ALTER TABLE prestamos
+  DROP COLUMN IF EXISTS material_type;

@@ -1,0 +1,65 @@
+@import url(tokens.css);
+@import url(semantic.css);
+@import "tailwindcss"; /* Esta línea se coloca al final para que funcione*/
+
+@theme {
+
+    /* ========BRAND======== */
+
+    --color-brand: var(--semantic-brand);
+    --color-brand-hover: var(--semantic-brand-hover);
+    --color-brand-soft: var(--semantic-brand-soft);
+
+    /* BACKGROUND */
+
+    --color-background: var(--semantic-background);
+    --color-surface: var(--semantic-surface);
+    --color-surface-muted: var(--semantic-surface-muted);
+    --color-background-inverse: var(--semantic-background-inverse);
+    --color-border: var(--semantic-border);
+
+    /* TEXT */
+
+    --color-text-primary: var(--semantic-text-primary);
+    --color-text-secondary: var(--semantic-text-secondary);
+    --color-text-muted: var(--semantic-text-muted);
+    --color-text-inverse: var(--semantic-text-inverse);
+
+    /* FOCUS */
+
+    --color-focus-ring: var(--semantic-focus-ring);
+    --color-focus-border: var(--semantic-focus-border);
+
+    /* STATE */
+
+    --color-success: var(--semantic-success);
+    --color-warning: var(--semantic-warning);
+    --color-error: var(--semantic-error);
+
+    /* TYPOGRAPHY */
+
+    --text-display: var(--semantic-font-size-display);
+    --text-h1: var(--semantic-font-size-h1);
+    --text-h2: var(--semantic-font-size-h2);
+    --text-h3: var(--semantic-font-size-h3);
+    --text-body: var(--semantic-font-size-body);
+    --text-medium: var(--semantic-font-size-medium);
+    --text-small: var(--semantic-font-size-small);
+    --text-caption: var(--semantic-font-size-caption);
+
+    /* FONT WEIGHT */
+
+    --font-heading: var(--semantic-font-weight-heading);
+    --font-body: var(--semantic-font-weight-body);
+    --font-label: var(--semantic-font-weight-label);
+}
+
+    /* ======= CONTROL DE PSEUDO ELEMENTOS NATIVOS DEL NAVEGADOR ======= */
+    @layer base {
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration {
+            display:none;
+        }
+    }

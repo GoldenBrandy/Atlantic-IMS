@@ -1,0 +1,1 @@
+ALTER TABLE materiales ADD COLUMN IF NOT EXISTS quotation_urls TEXT[];

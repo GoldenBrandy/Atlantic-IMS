@@ -1,0 +1,26 @@
+export const MATERIAL_REPORT_FIELDS = [
+  { key: "name", label: "Nombre", default: true },
+  { key: "type", label: "Tipo", default: true },
+  { key: "quantity", label: "Cantidad", default: true },
+  { key: "marca_name", label: "Marca", default: true },
+  { key: "model", label: "Modelo", default: false },
+  { key: "category", label: "Categoría", default: false },
+  { key: "sena_plate", label: "Placa SENA", default: false },
+  { key: "external_id", label: "ID", default: false },
+  { key: "location", label: "Ubicación", default: false },
+  {
+    key: "purchase_date",
+    label: "Fecha compra",
+    default: false,
+    value: (m) => (m.purchase_date ? String(m.purchase_date).slice(0, 10) : ""),
+  },
+  { key: "unit_value", label: "Valor unitario", default: false },
+  { key: "total_value", label: "Valor Total", default: false },
+  { key: "description", label: "Descripción", default: false },
+  {
+    key: "is_active",
+    label: "Estado",
+    default: true,
+    value: (m) => (m.is_active ? "Activo" : "Inactivo"),
+  },
+];

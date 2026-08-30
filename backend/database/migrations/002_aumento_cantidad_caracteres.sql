@@ -1,0 +1,2 @@
+ALTER TABLE users
+ALTER COLUMN document_type TYPE VARCHAR(50);
