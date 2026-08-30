@@ -1,0 +1,5 @@
+ALTER TABLE marcas
+  DROP COLUMN IF EXISTS code;
+
+ALTER TABLE marcas
+  ALTER COLUMN status SET DEFAULT 'activo';

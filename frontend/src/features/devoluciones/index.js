@@ -1,0 +1,1 @@
+export { default as CreateDevolucionPage } from './pages/CreateDevolucionPage';

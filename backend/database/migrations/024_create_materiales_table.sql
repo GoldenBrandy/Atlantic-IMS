@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS materiales (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  type VARCHAR(30) NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 0,
+  description VARCHAR(255),
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  image_url TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);

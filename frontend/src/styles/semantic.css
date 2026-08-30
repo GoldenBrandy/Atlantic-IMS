@@ -1,0 +1,48 @@
+:root {
+    /* Brand */
+    --semantic-brand: var(--primary-950);
+    --semantic-brand-hover: var(--primary-800); 
+    --semantic-brand-soft: var(--primary-200); 
+    --semantic-brand-soft-hover: var(--primary-400); 
+
+    /* Background */
+    --semantic-background: var(--gray-50);
+    --semantic-surface: var(--white);
+    --semantic-surface-muted: var(--gray-100);
+    --semantic-background-inverse: var(--gray-950);
+
+    /* Text */
+    --semantic-text-primary: var(--gray-950);
+    --semantic-text-secondary: var(--gray-700);
+    --semantic-text-muted: var(--gray-500);
+    --semantic-text-inverse: var(--white);
+
+    /* Border */
+    --semantic-border: var(--gray-300);
+    --semantic-border-strong: var(--gray-500);
+
+    /* Focus */
+    --semantic-focus-ring: var(--primary-700);
+    --semantic-focus-border: var(--gray-500);
+
+    /* State */
+    --semantic-success: var(--primary-950);
+    --semantic-warning: var(--terciario-950);
+    --semantic-error: var(--secundary-950);
+
+    /* Typography */
+    --semantic-font-size-display: var(--fs-xxl);
+    --semantic-font-size-h1: var(--fs-lg);
+    --semantic-font-size-h2: var(--fs-md);
+    --semantic-font-size-h3: var(--fs-sm);
+    --semantic-font-size-body: var(--fs-xs);
+    --semantic-font-size-medium: var(--fs-xxs);
+    --semantic-font-size-small: var(--fs-xxxs);
+    --semantic-font-size-caption: var(--fs-xxxxs);
+
+    /* Font weight */
+    --semantic-font-weight-heading: var(--font-weight-bold);
+    --semantic-font-weight-body: var(--font-weight-regular);
+    --semantic-font-weight-label: var(--font-weight-regular);
+
+}
