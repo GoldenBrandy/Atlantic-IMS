@@ -18,6 +18,7 @@ import marcaRoutes from "./marcas/marcas.routes.js";
 import prestamoRoutes from "./prestamos/prestamos.routes.js";
 import tareaRoutes from "./tareas/tareas.routes.js";
 import devolucionRoutes from "./devoluciones/devoluciones.routes.js";
+import inventarioRoutes from "./inventarios/inventarios.routes.js";
 import auditLogsRoutes from "./auditLogs/auditLogs.routes.js";
 import { auditLogMiddleware } from "../middlewares/auditLog.middleware.js";
 
@@ -66,6 +67,7 @@ app.use("/api/marcas", marcaRoutes);
 app.use("/api/prestamos", prestamoRoutes);
 app.use("/api/tareas", tareaRoutes);
 app.use("/api/devoluciones", devolucionRoutes);
+app.use("/api/inventarios", inventarioRoutes);
 app.use("/api/audit-logs", auditLogsRoutes);
 
 // Manejador de errores global: evita que Express responda con su pagina

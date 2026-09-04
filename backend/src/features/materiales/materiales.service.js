@@ -11,8 +11,12 @@ function toId(value) {
 // nunca quede inconsistente sin importar lo que mande el cliente.
 function mapPayload(data) {
   const quantity = Number(data.quantity) || 0;
-  const unitValue = data.unitValue !== undefined && data.unitValue !== "" ? Number(data.unitValue) : null;
-  const totalValue = unitValue !== null ? Number((quantity * unitValue).toFixed(2)) : null;
+  const unitValue =
+    data.unitValue !== undefined && data.unitValue !== ""
+      ? Number(data.unitValue)
+      : null;
+  const totalValue =
+    unitValue !== null ? Number((quantity * unitValue).toFixed(2)) : null;
 
   return {
     name: data.name,
@@ -20,12 +24,26 @@ function mapPayload(data) {
     quantity,
     description: data.description,
     isActive: data.isActive ?? true,
-    imageUrl: data.imageUrl ?? null,
-    technicalSheetUrls: Array.isArray(data.technicalSheetUrls) ? data.technicalSheetUrls.filter(Boolean) : [],
-    quotationUrls: Array.isArray(data.quotationUrls) ? data.quotationUrls.filter(Boolean) : [],
+    imageUrls: Array.isArray(data.imageUrls)
+      ? data.imageUrls.filter(Boolean)
+      : [],
+    technicalSheetUrls: Array.isArray(data.technicalSheetUrls)
+      ? data.technicalSheetUrls.filter(Boolean)
+      : [],
+    quotations: Array.isArray(data.quotations)
+      ? data.quotations
+          .filter((q) => q?.url)
+          .map((q) => ({
+            url: q.url,
+            value:
+              q.value !== undefined && q.value !== "" ? Number(q.value) : null,
+            date: q.date || null,
+          }))
+      : [],
     senaPlate: data.senaPlate ?? null,
     marcaId: toId(data.marcaId ?? data.marca),
     custodianId: toId(data.custodianId ?? data.custodian),
+    inventarioId: toId(data.inventarioId ?? data.inventario),
     location: data.location ?? null,
     purchaseDate: data.purchaseDate || null,
     unitValue,

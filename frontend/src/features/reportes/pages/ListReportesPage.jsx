@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ReportConfigModal } from "@/shared";
-import { FileText, Users, Package, ShoppingBag, Tag, UsersRound, ClipboardList, HandCoins, History, Loader2 } from "lucide-react";
+import { FileText, Users, Package, ShoppingBag, Tag, UsersRound, ClipboardList, HandCoins, History, Boxes, Loader2 } from "lucide-react";
 import { sileo } from "sileo";
 import { isSuperUser } from "@/features/auth";
 
@@ -20,6 +20,8 @@ import { getPrestamos } from "@/features/prestamos/services/prestamoService";
 import { PRESTAMO_REPORT_FIELDS } from "@/features/prestamos/reports/prestamoReportFields";
 import { getAuditLogs } from "@/features/historial/services/auditLogService";
 import { HISTORIAL_REPORT_FIELDS } from "@/features/historial/reports/historialReportFields";
+import { getInventarios } from "@/features/inventarios/services/inventarioService";
+import { INVENTARIO_REPORT_FIELDS } from "@/features/inventarios/reports/inventarioReportFields";
 
 const REPORT_MODULES = [
   {
@@ -40,6 +42,7 @@ const REPORT_MODULES = [
     fields: MATERIAL_REPORT_FIELDS,
     title: "Reporte de materiales",
     fileNamePrefix: "materiales",
+    filterField: { key: "inventario_name", label: "Inventario" },
   },
   {
     key: "productos",
@@ -85,6 +88,15 @@ const REPORT_MODULES = [
     fields: PRESTAMO_REPORT_FIELDS,
     title: "Reporte de préstamos",
     fileNamePrefix: "prestamos",
+  },
+  {
+    key: "inventarios",
+    label: "Inventarios",
+    icon: Boxes,
+    fetch: getInventarios,
+    fields: INVENTARIO_REPORT_FIELDS,
+    title: "Reporte de inventarios",
+    fileNamePrefix: "inventarios",
   },
   {
     key: "historial",

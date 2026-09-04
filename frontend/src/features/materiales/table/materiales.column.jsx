@@ -59,6 +59,11 @@ export function getMaterialColumns(onToggleStatus) {
       cell: ({ row }) => muted(row.original.marca_name),
     },
     {
+      id: "inventario",
+      header: "Inventario",
+      cell: ({ row }) => muted(row.original.inventario_name),
+    },
+    {
       id: "custodian",
       header: "Cuentadante",
       cell: ({ row }) => {

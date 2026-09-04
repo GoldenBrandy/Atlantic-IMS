@@ -83,9 +83,13 @@ export default function MaterialRowActions({ material }) {
         title={material.name}
         fields={[
           {
-            label: "Foto",
-            value: material.image_url ? (
-              <img src={material.image_url} alt={material.name} className="h-16 w-16 rounded-lg object-cover" />
+            label: "Foto(s)",
+            value: material.image_urls?.length ? (
+              <div className="flex gap-2">
+                {material.image_urls.map((url, index) => (
+                  <img key={index} src={url} alt={`Foto ${index + 1}`} className="h-16 w-16 rounded-lg object-cover" />
+                ))}
+              </div>
             ) : null,
           },
           { label: "Nombre", value: material.name },
@@ -110,18 +114,25 @@ export default function MaterialRowActions({ material }) {
                 },
                 {
                   label: "Cotizaciones",
-                  values: material.quotation_urls?.length ? (
+                  value: material.quotations?.length ? (
                     <div className="flex flex-col gap-1">
-                      {material.quotation_urls.map((url, index) => (
-                        <a key={index} href={url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
-                          Ver cotización {index + 1}
-                        </a>
+                      {material.quotations.map((quotation, index) => (
+                        <div key={index} className="flex flex-wrap items-center gap-2">
+                          <a href={quotation.url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
+                            Ver cotización {index + 1}
+                          </a>
+                          {quotation.value != null && (
+                            <span className="text-caption text-neutral-600">{currencyFormatter.format(quotation.value)}</span>
+                          )}
+                          {quotation.date && <span className="text-caption text-neutral-600">{quotation.date}</span>}
+                        </div>
                       ))}
                     </div>
                   ) : null,
                 },
                 { label: "Placa SENA", value: material.sena_plate },
                 { label: "Marca", value: material.marca_name },
+                { label: "Inventario", value: material.inventario_name },
                 { label: "Ubicación", value: material.location },
                 { label: "Fecha compra", value: material.purchase_date ? String(material.purchase_date).slice(0, 10) : null },
                 { label: "Valor unitario", value: material.unit_value ? currencyFormatter.format(material.unit_value) : null },

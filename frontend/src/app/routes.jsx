@@ -11,6 +11,7 @@ import { CreateMarcaPage, ListMarcasPage, EditMarcaPage } from '@/features/marca
 import { CreateTareaPage, ListTareasPage, EditTareaPage } from '@/features/tareas';
 import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage } from '@/features/prestamos';
 import { CreateDevolucionPage } from '@/features/devoluciones';
+import { ListInventariosPage, CreateInventarioPage, EditInventarioPage } from '@/features/inventarios';
 import { ListReportesPage } from '@/features/reportes';
 import { ListHistorialPage } from '@/features/historial';
 import { LoginRoute, RequireAuth, RequireSuperUser } from "./routerGuards";
@@ -89,6 +90,9 @@ const router = createBrowserRouter([
             { path: "prestamos/crear", element: <CreatePrestamoPage /> },
             { path: "prestamos/:id/edit", element: <EditPrestamoPage /> },
             { path: "devoluciones/crear", element: <CreateDevolucionPage /> },
+            { path: "inventarios", element: <ListInventariosPage /> },
+            { path: "inventarios/crear", element: <CreateInventarioPage /> },
+            { path: "inventarios/:id/edit", element: <EditInventarioPage /> },
             { path: "reportes", element: <ListReportesPage /> },
             { path: "historial", element: <RequireSuperUser>
                 <ListHistorialPage />
