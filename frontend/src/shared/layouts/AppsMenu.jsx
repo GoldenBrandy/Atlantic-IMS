@@ -14,6 +14,7 @@ import {
   FileBarChart,
   HandCoins,
   History,
+  Boxes,
 } from "lucide-react";
 import { isSuperUser } from "@/features/auth";
 
@@ -32,6 +33,7 @@ const MODULES = [
   { label: "Tareas", to: "/dashboard/tareas", icon: ClipboardList, iconBg: "bg-teal-100", iconColor: "text-teal-600" },
   { label: "Reportes", to: "/dashboard/reportes", icon: FileBarChart, iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
   { label: "Préstamos", to: "/dashboard/prestamos", icon: HandCoins, iconBg: "bg-violet-100", iconColor: "text-violet-600" },
+  { label: "Inventarios", to: "/dashboard/inventarios", icon: Boxes, iconBg: "bg-lime-100", iconColor: "text-lime-600" },
   { label: "Historial", to: "/dashboard/historial", icon: History, iconBg: "bg-neutral-200", iconColor: "text-neutral-700", superUserOnly: true },
 ];
 

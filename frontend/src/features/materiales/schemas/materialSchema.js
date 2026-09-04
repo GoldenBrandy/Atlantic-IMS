@@ -15,13 +15,29 @@ export const materialSchema = z
       .max(200, "La descripción es demasiado larga")
       .optional(),
     isActive: z.boolean(),
-    materialImage: z.string().optional(),
+    // Foto del material: hasta 3 imagenes, opcional.
+    materialImages: z.array(z.string()).optional(),
     // Campos que aplican (y se exigen segun el tipo) para consumo y devolutivo.
     technicalSheetImages: z.array(z.string()).optional(),
-    quotationImages: z.array(z.string()).optional(),
-    senaPlate: z.string().max(50, "La placa SENA es demasiado larga").optional(),
+    // Cotizaciones en PDF: obligatorias (1 a 3) para consumo y devolutivo.
+    // Cada una lleva ademas su valor y su fecha (para el promedio de las
+    // cotizaciones vigentes, <=90 dias).
+    quotations: z
+      .array(
+        z.object({
+          url: z.string().min(1),
+          value: z.union([z.string(), z.number()]).optional(),
+          date: z.string().optional(),
+        }),
+      )
+      .optional(),
+    senaPlate: z
+      .string()
+      .max(50, "La placa SENA es demasiado larga")
+      .optional(),
     marca: z.string().optional(),
     custodian: z.string().optional(),
+    inventario: z.string().optional(),
     location: z.string().max(150, "La ubicación es demasiado larga").optional(),
     purchaseDate: z.string().optional(),
     unitValue: z.union([z.string(), z.number()]).optional(),
@@ -35,41 +51,111 @@ export const materialSchema = z
     if (!isConsumo && !isDevolutivo) return;
 
     if (!data.materialDescription) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["materialDescription"], message: "La descripción es obligatoria" });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["materialDescription"],
+        message: "La descripción es obligatoria",
+      });
     }
     if (!data.marca) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["marca"], message: "Debe seleccionar una marca" });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["marca"],
+        message: "Debe seleccionar una marca",
+      });
     }
     if (!data.purchaseDate) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["purchaseDate"], message: "Debe indicar la fecha de compra" });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["purchaseDate"],
+        message: "Debe indicar la fecha de compra",
+      });
     }
-    if (!data.quotationImages || data.quotationImages.length === 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["quotationImages"], message: "Debe adjuntar al menos una cotización en PDF" });
+    if (!data.quotations || data.quotations.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["quotations"],
+        message: "Debe adjuntar al menos una cotización en PDF",
+      });
+    } else if (
+      data.quotations.some(
+        (q) =>
+          q.value === undefined ||
+          q.value === "" ||
+          Number.isNaN(Number(q.value)) ||
+          !q.date,
+      )
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["quotations"],
+        message: "Cada cotización debe tener su valor y su fecha",
+      });
     }
-    if (data.unitValue === undefined || data.unitValue === "" || Number.isNaN(Number(data.unitValue))) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["unitValue"], message: "Debe indicar el valor unitario" });
+    if (
+      data.unitValue === undefined ||
+      data.unitValue === "" ||
+      Number.isNaN(Number(data.unitValue))
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["unitValue"],
+        message: "Debe indicar el valor unitario",
+      });
     } else if (Number(data.unitValue) < 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["unitValue"], message: "El valor unitario no puede ser negativo" });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["unitValue"],
+        message: "El valor unitario no puede ser negativo",
+      });
     }
 
     if (isConsumo && !data.custodian) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["custodian"], message: "Debe seleccionar un cuentadante" });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["custodian"],
+        message: "Debe seleccionar un cuentadante",
+      });
     }
 
-    if (isConsumo && data.senaPlate?.trim() && Number(data.materialQuantity) !== 1) {
+    if (
+      isConsumo &&
+      (!data.technicalSheetImages || data.technicalSheetImages.length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["technicalSheetImages"],
+        message: "Debe adjuntar la ficha técnica",
+      });
+    }
+
+    if (
+      isConsumo &&
+      data.senaPlate?.trim() &&
+      Number(data.materialQuantity) !== 1
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["materialQuantity"],
-        message: "Si el material de consumo tiene placa SENA, la cantidad debe ser 1",
+        message:
+          "Si el material de consumo tiene placa SENA, la cantidad debe ser 1",
       });
     }
 
     if (isDevolutivo) {
       if (!data.model) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["model"], message: "El modelo es obligatorio" });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["model"],
+          message: "El modelo es obligatorio",
+        });
       }
       if (!data.category) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["category"], message: "Debe seleccionar una categoría" });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["category"],
+          message: "Debe seleccionar una categoría",
+        });
       }
     }
   });

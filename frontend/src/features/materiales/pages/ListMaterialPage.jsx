@@ -112,6 +112,7 @@ export default function ListMaterialPage() {
         fields={MATERIAL_REPORT_FIELDS}
         title="Reporte de materiales"
         fileNamePrefix="materiales"
+        filterField={{ key: "inventario_name", label: "Inventario" }}
       />
 
       <DataTable
