@@ -1,4 +1,7 @@
-const API_URL = "http://localhost:4000/api/notifications";
+// const API_URL = "http://localhost:4000/api/notifications";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/notifications`;
 
 function authHeaders() {
   const token = sessionStorage.getItem("token");

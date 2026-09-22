@@ -1,4 +1,8 @@
-const API_URL = "http://localhost:4000/api/tareas";
+// const API_URL = "http://localhost:4000/api/tareas";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/tareas`;
+
 
 export async function getTareas() {
   const response = await fetch(API_URL);

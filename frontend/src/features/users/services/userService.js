@@ -1,4 +1,8 @@
-const API_URL = "http://localhost:4000/api/users";
+// const API_URL = "http://localhost:4000/api/users";
+import { API_URL } from "@/features/config";
+
+const USERS_API_URL = `${API_URL}/users`;
+
 
 // Arma un nombre visible a partir de los campos reales del usuario
 // (algunos, como last_name_1, pueden venir vacios).
@@ -7,7 +11,7 @@ export function formatUserName(user) {
 }
 
 export async function getUsers() {
-  const response = await fetch(API_URL);
+  const response = await fetch(USERS_API_URL);
 
   if (!response.ok) {
     throw new Error("Error obteniendo los usuarios");
@@ -18,7 +22,7 @@ export async function getUsers() {
 
 export async function createUser(userData) {
   const token = sessionStorage.getItem("token");
-  const response = await fetch(API_URL, {
+  const response = await fetch(USERS_API_URL, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -38,7 +42,7 @@ export async function createUser(userData) {
 }
 
 export async function getUserById(userId) {
-  const response = await fetch(`${API_URL}/${userId}`);
+  const response = await fetch(`${USERS_API_URL}/${userId}`);
 
   if (!response.ok) {
     const error = await response.json();
@@ -50,7 +54,7 @@ export async function getUserById(userId) {
 
 export async function updateUser(userId, userData) {
   const token = sessionStorage.getItem("token");
-  const response = await fetch(`${API_URL}/${userId}`, {
+  const response = await fetch(`${USERS_API_URL}/${userId}`, {
     method: "PUT",
     headers: {
       "content-type": "application/json",
@@ -72,7 +76,7 @@ export async function updateUser(userId, userData) {
 // Deshabilita varios usuarios a la vez (solo super administrador).
 export async function bulkDisableUsers(ids) {
   const token = sessionStorage.getItem("token");
-  const response = await fetch(`${API_URL}/bulk-disable`, {
+  const response = await fetch(`${USERS_API_URL}/bulk-disable`, {
     method: "PATCH",
     headers: {
       "content-type": "application/json",
@@ -92,7 +96,7 @@ export async function bulkDisableUsers(ids) {
 // Activa/desactiva un unico usuario (switch individual en la tabla).
 export async function setUserActive(userId, isActive) {
   const token = sessionStorage.getItem("token");
-  const response = await fetch(`${API_URL}/${userId}/status`, {
+  const response = await fetch(`${USERS_API_URL}/${userId}/status`, {
     method: "PATCH",
     headers: {
       "content-type": "application/json",
@@ -112,7 +116,7 @@ export async function setUserActive(userId, isActive) {
 // Cambia la contrasena del usuario autenticado (solo la propia cuenta).
 export async function changePassword(userId, { currentPassword, newPassword }) {
   const token = sessionStorage.getItem("token");
-  const response = await fetch(`${API_URL}/${userId}/password`, {
+  const response = await fetch(`${USERS_API_URL}/${userId}/password`, {
     method: "PUT",
     headers: {
       "content-type": "application/json",

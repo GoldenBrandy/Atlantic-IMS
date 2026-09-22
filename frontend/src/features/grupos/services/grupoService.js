@@ -2,7 +2,10 @@
 // "Tipo de Usuario" y "Gestion de Permisos" (antes era una tabla aparte con
 // lider/integrantes). Se normaliza group_id -> id para que los consumidores
 // existentes (ej. Prestamos, que ya esperaba { id, group_name }) no cambien.
-const API_URL = "http://localhost:4000/api/groups";
+// const API_URL = "http://localhost:4000/api/groups";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/groups`;
 
 function normalize(group) {
   return { ...group, id: group.group_id };

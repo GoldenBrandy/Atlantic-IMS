@@ -3,7 +3,11 @@ import { Input, Button, IconButton, bigLabelClass } from "@/shared";
 import { useNavigate } from "react-router-dom";
 import { MoveLeft, Eye, EyeOff } from "lucide-react";
 
-const API_URL = "http://localhost:4000/api/auth/login";
+// const API_URL = "http://localhost:4000/api/auth/login";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/auth/login`;
+
 
 export default function Login({
   nextTo = "/dashboard",

@@ -1,4 +1,7 @@
-const API_URL = "http://localhost:4000/api/prestamos";
+// const API_URL = "http://localhost:4000/api/prestamos";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/prestamos`;
 
 export async function getPrestamos() {
   const response = await fetch(API_URL);
