@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Input, Button, IconButton } from "@/shared";
-import { useNavigate, Link } from "react-router-dom";
+import { Input, Button, IconButton, bigLabelClass } from "@/shared";
+import { useNavigate } from "react-router-dom";
 import { MoveLeft, Eye, EyeOff } from "lucide-react";
 
 const API_URL = "http://localhost:4000/api/auth/login";
@@ -53,6 +53,14 @@ export default function Login({
       sessionStorage.setItem("token", data.token);
       sessionStorage.setItem("user", JSON.stringify(data.user));
 
+      // Si el admin creo esta cuenta, la contrasena es la generada
+      // automaticamente y es obligatorio cambiarla antes de usar el resto
+      // del sistema.
+      if (data.user?.mustChangePassword) {
+        navigate("/dashboard/cambiar-contrasena", { replace: true });
+        return;
+      }
+
       navigate(nextTo, {
         replace: true,
       });
@@ -63,8 +71,7 @@ export default function Login({
     }
   };
 
-  return (
-    <section className="w-full max-w-md [&_input]:text-black [&_input::placeholder]:text-black/70 [&_label]:text-black [&_select]:text-black [&_span]:text-black">
+  return <section className="w-full max-w-md [&_input]:text-black [&_input::placeholder]:text-black/70 [&_label]:text-black [&_select]:text-black [&_span]:text-black">
       {showBackButton && (
         <div className="mb-4">
           <IconButton
@@ -87,9 +94,11 @@ export default function Login({
         onSubmit={handleSubmit}
         noValidate
       >
-        <div className="mx-auto grid w-full max-w-md gap-6 rounded-md border bg-white/80 p-8 shadow-lg backdrop-blur-sm">
+        <div className="mx-auto grid w-full max-w-md gap-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <Input
             label="Correo"
+            dense
+            labelClassName={bigLabelClass}
             name="userEmail"
             placeholder="Ingrese su correo"
             type="email"
@@ -99,6 +108,8 @@ export default function Login({
 
           <Input
             label="Contraseña"
+            dense
+            labelClassName={bigLabelClass}
             name="userPassword"
             placeholder="Ingrese su contraseña"
             type={showPassword ? "text" : "password"}
@@ -118,13 +129,6 @@ export default function Login({
             }
           />
 
-          <Link
-            to="/auth/recuperar"
-            className="text-right text-small text-(--primary-950) hover:underline"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
-
           {errorMessage && (
             <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {errorMessage}
@@ -136,8 +140,19 @@ export default function Login({
               {isSubmitting ? "Ingresando..." : "Iniciar Sesión"}
             </Button>
           </div>
+
+          {/* Enlaces auxiliares: recuperar contrasena olvidada y pedir acceso
+                    (no existe auto-registro publico). */}
+          <div className="flex flex-col items-center gap-1 pt-2 text-medium">
+            <button type="button" className="text-(--primary-950) underline" onClick={() => navigate("/auth/forgot-password")}
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+            <button type="button" className="text-(--primary-950) underline" onClick={() => navigate("/auth/solicitar-registro")}>
+              ¿No tienes cuenta? Solicítala
+            </button>
+          </div>
         </div>
       </form>
-    </section>
-  );
+    </section>;
 }

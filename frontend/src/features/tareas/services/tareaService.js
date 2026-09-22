@@ -52,3 +52,28 @@ export async function updateTarea(id, tareaData) {
 
   return response.json();
 }
+
+// El asignado abre la tarea: notifica (in-app) a quien la asigno.
+export async function viewTarea(id) {
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${API_URL}/${id}/view`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Error al registrar la vista de la tarea");
+  return response.json();
+}
+
+// El asignador verifica una tarea "completada".
+export async function verifyTarea(id) {
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${API_URL}/${id}/verify`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error al verificar la tarea");
+  }
+  return response.json();
+}

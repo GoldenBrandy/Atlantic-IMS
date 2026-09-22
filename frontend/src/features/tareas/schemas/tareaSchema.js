@@ -19,6 +19,8 @@ export const tareaSchema = z.object({
     .min(5, "La descripción debe tener al menos 5 caracteres")
     .max(500, "La descripción es demasiado larga"),
   userEndDates: z.record(z.string(), z.string()).optional(),
+  // Progreso de la tarea (0-100), lo actualiza el asignado a medida que avanza.
+  progress: z.coerce.number().min(0, "El progreso mínimo es 0").max(100, "El progreso máximo es 100").optional(),
 }).refine((data) => data.endDate >= data.startDate, {
   message: "La fecha fin no puede ser anterior a la fecha de inicio",
   path: ["endDate"],

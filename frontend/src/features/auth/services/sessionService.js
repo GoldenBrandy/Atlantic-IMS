@@ -15,3 +15,8 @@ export function getToken() {
 export function isSuperUser() {
   return getCurrentUser()?.isSuperUser === true;
 }
+
+// El admin registro a este usuario con una contraseña automática: debe cambiarla antes de poder usar el resto del sistema
+export function mustChangePassword() {
+  return getCurrentUser()?.mustChangePassword === true;
+}

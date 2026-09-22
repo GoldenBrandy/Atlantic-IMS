@@ -7,7 +7,7 @@ import { sileo } from "sileo";
 
 const emptyForm = { currentPassword: "", newPassword: "", confirmPassword: "" };
 
-export default function ChangePasswordForm({ userId }) {
+export default function ChangePasswordForm({ userId, onSuccess }) {
   const [formData, setFormData] = useState(emptyForm);
   const [errors, setErrors] = useState({});
   const [showPasswords, setShowPasswords] = useState(false);
@@ -41,6 +41,7 @@ export default function ChangePasswordForm({ userId }) {
         description: "Tu contraseña se cambió correctamente",
       });
       setFormData(emptyForm);
+      onSuccess?.();
     } catch (err) {
       console.error(err);
       if (err?.field) {

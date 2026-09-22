@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AuthLayout, DashboardLayout } from "@/shared";
-import { ForgotPassword, ResetPassword } from "@/features/auth";
-import { CreateUserPage, ListUserPage, EditUserPage, ProfilePage } from "@/features/users";
+import {  ForgotPassword, RequestAccess } from "@/features/auth";
+import { CreateUserPage, ListUserPage, EditUserPage, ProfilePage, ForcePasswordChangePage } from "@/features/users";
 import { DashboardHomePage } from "@/features/dashboard";
 import { AccessPage } from "@/features/access";
 import { ListMaterialPage, CreateMaterialPage, EditMaterialPage } from '@/features/materiales';
@@ -9,7 +9,7 @@ import { CreateGrupoPage, ListGruposPage, EditGrupoPage } from '@/features/grupo
 import { CreateProductoPage, ListProductosPage, EditProductoPage } from '@/features/productos';
 import { CreateMarcaPage, ListMarcasPage, EditMarcaPage } from '@/features/marcas';
 import { CreateTareaPage, ListTareasPage, EditTareaPage } from '@/features/tareas';
-import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage } from '@/features/prestamos';
+import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage, PrestamoTicketPage } from '@/features/prestamos';
 import { CreateDevolucionPage } from '@/features/devoluciones';
 import { ListInventariosPage, CreateInventarioPage, EditInventarioPage } from '@/features/inventarios';
 import { ListReportesPage } from '@/features/reportes';
@@ -29,8 +29,8 @@ const router = createBrowserRouter([
         errorElement: <RouteErrorBoundary />,
         children:[
             {index: true, element: <LoginRoute />},
-            {path: "recuperar", element: <ForgotPassword />},
-            {path: "restablecer", element: <ResetPassword />},
+            {path: "forgot-password", element: <ForgotPassword />},
+            {path: "solicitar-registro", element: <RequestAccess />},
         ],
     },
     {
@@ -60,6 +60,8 @@ const router = createBrowserRouter([
             { index: true, element: <DashboardHomePage /> },
             { path: "usuarios/crear", element: <CreateUserPage /> },
             { path: "perfil", element: <ProfilePage /> },
+            { path: "cambiar-contrasena", element: <ForcePasswordChangePage /> },
+            { path: "permisos", element: <AccessPage /> },
             { path: "userList", element: <ListUserPage /> },
             { path: "users", element: <ListUserPage /> },
             {
@@ -89,6 +91,7 @@ const router = createBrowserRouter([
             { path: "prestamos", element: <ListPrestamosPage /> },
             { path: "prestamos/crear", element: <CreatePrestamoPage /> },
             { path: "prestamos/:id/edit", element: <EditPrestamoPage /> },
+            { path: "prestamos/:id/ticket", element: <PrestamoTicketPage /> },
             { path: "devoluciones/crear", element: <CreateDevolucionPage /> },
             { path: "inventarios", element: <ListInventariosPage /> },
             { path: "inventarios/crear", element: <CreateInventarioPage /> },
