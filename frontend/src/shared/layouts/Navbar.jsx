@@ -2,6 +2,7 @@ import { ChevronDown, LogOut, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import GlobalSearch from "./GlobalSearch";
 import AppsMenu from "./AppsMenu";
+import { NotificationBell } from "@/features/notifications";
 import {
   Dropdown,
   DropdownContent,
@@ -31,6 +32,7 @@ export default function Navbar() {
           <GlobalSearch />
           <div className="flex flex-1 items-center justify-end gap-5">
             <AppsMenu />
+            <NotificationBell />
             <div>
               <Dropdown>
                 <DropdownTrigger>

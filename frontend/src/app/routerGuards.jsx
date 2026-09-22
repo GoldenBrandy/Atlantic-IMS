@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { Login, isSuperUser } from "@/features/auth";
+import { Login, isSuperUser, mustChangePassword } from "@/features/auth";
 
 export function RequireAuth({ children }) {
     const location = useLocation();
@@ -8,6 +8,13 @@ export function RequireAuth({ children }) {
     if (!token) {
         return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
     }
+
+    // Si el admin registro a este usuario, debe cambiar su contrasena
+  // automatica antes de usar el resto del sistema (evita que entre por una
+  // URL directa saltandose la pantalla obligatoria).
+  if (mustChangePassword() && location.pathname !== "/dashboard/cambiar-contrasena") {
+    return <Navigate to="/dashboard/cambiar-contrasena" replace />;
+  }
 
     return children;
 }

@@ -32,6 +32,11 @@ export function getPrestamoColumns(users = []) {
       cell: ({ row }) => findUserName(users, row.original.requesting_user),
     },
     {
+      id: "requestingUserDocument",
+      header: "N.° documento",
+      cell: ({ row }) => row.original.requesting_user_document || "-",
+    },
+    {
       id: "lendingUser",
       header: "Usuario prestador",
       cell: ({ row }) => findUserName(users, row.original.lending_user),

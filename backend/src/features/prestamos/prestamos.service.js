@@ -18,6 +18,8 @@ function mapPayload(data) {
     startDate: data.startDate,
     dueDate: data.dueDate,
     signatureUrl: data.signatureUrl ?? null,
+    requesterIdentityConfirmed: Boolean(data.requesterIdentityConfirmed),
+    lenderIdentityConfirmed: Boolean(data.lenderIdentityConfirmed),
   };
 }
 
@@ -43,6 +45,18 @@ export const prestamoService = {
       const error = new Error("Debe seleccionar al menos un ítem a prestar");
       error.statusCode = 400;
       error.field = "materialIds";
+      throw error;
+    }
+    if (!data.requesterIdentityConfirmed){
+      const error = new Error("Debe confirmarse la identidad del usuario solicitante");
+      error.statusCode = 400;
+      error.field = "requesterIdentityConfirmed";
+      throw error;
+    }
+    if (!data.lenderIdentityConfirmed){
+      const error = new Error("Debe confirmarse la identidad del usuario prestador");
+      error.statusCode = 400;
+      error.field = "lenderIdentityConfirmed";
       throw error;
     }
     return prestamoRepository.create(mapPayload(data));

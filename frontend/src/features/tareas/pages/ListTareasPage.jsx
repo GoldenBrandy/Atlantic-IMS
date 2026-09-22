@@ -12,7 +12,7 @@ export default function ListTareasPage() {
   const [tareas, setTareas] = useState([]);
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
+  const loadTareas = () => {
     getTareas()
       .then(setTareas)
       .catch((err) => {
@@ -21,11 +21,14 @@ export default function ListTareasPage() {
           description: err?.message || String(err),
         });
       });
+  };
 
+  useEffect(() => {
+    loadTareas();
     getUsers().then(setUsers).catch(console.error);
   }, []);
 
-  const tareaColumns = useMemo(() => getTareaColumns(users), [users]);
+  const tareaColumns = useMemo(() => getTareaColumns(users, loadTareas), [users]);
 
   return (
     <div className="p-6 space-y-6">

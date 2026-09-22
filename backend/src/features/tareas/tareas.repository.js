@@ -22,7 +22,7 @@ async function attachAssignments(tarea) {
 export const tareaRepository = {
   async findAll() {
     const result = await pool.query(`
-      SELECT id, task_name, status, start_date, end_date, description
+      SELECT id, task_name, status, start_date, end_date, description, assigned_by, progress, verified_at
       FROM tareas
       ORDER BY id;
     `);
@@ -31,7 +31,7 @@ export const tareaRepository = {
 
   async findById(id) {
     const result = await pool.query(
-      `SELECT id, task_name, status, start_date, end_date, description
+      `SELECT id, task_name, status, start_date, end_date, description, assigned_by, progress, verified_at
        FROM tareas WHERE id = $1;`,
       [id],
     );
@@ -44,10 +44,13 @@ export const tareaRepository = {
       await client.query("BEGIN");
 
       const insertResult = await client.query(
-        `INSERT INTO tareas (task_name, status, start_date, end_date, description)
-         VALUES ($1,$2,$3,$4,$5)
+        `INSERT INTO tareas (task_name, status, start_date, end_date, description, assigned_by, progress)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
          RETURNING id;`,
-        [data.taskName, data.status, data.startDate || null, data.endDate || null, data.description || null],
+        [
+          data.taskName, data.status, data.startDate || null, data.endDate || null, data.description || null,
+          data.assignedBy || null, data.progress ?? 0,
+        ],
       );
       const tareaId = insertResult.rows[0].id;
 
@@ -80,12 +83,14 @@ export const tareaRepository = {
     try {
       await client.query("BEGIN");
 
+      // assigned_by NO se toca aqui a proposito: preserva quien creo/asigno
+      // la tarea originalmente (el "remitente"), sin importar quien la edite despues.
       const updateResult = await client.query(
         `UPDATE tareas SET
-           task_name = $1, status = $2, start_date = $3, end_date = $4, description = $5
-         WHERE id = $6
+           task_name = $1, status = $2, start_date = $3, end_date = $4, description = $5, progress = $6
+         WHERE id = $7
          RETURNING id;`,
-        [data.taskName, data.status, data.startDate || null, data.endDate || null, data.description || null, id],
+        [data.taskName, data.status, data.startDate || null, data.endDate || null, data.description || null, data.progress ?? 0, id],
       );
 
       if (updateResult.rows.length === 0) {
@@ -118,5 +123,36 @@ export const tareaRepository = {
     } finally {
       client.release();
     }
+  },
+
+  // Marca la tarea como verificada por el asignador (solo se llama luego de
+  // confirmar en el service que quien verifica es el asignador y que la
+  // tarea esta "completada").
+  async verify(id) {
+    const result = await pool.query(
+      `UPDATE tareas SET verified_at = NOW() WHERE id = $1 RETURNING id, verified_at;`,
+      [id],
+    );
+    return result.rows[0] ?? null;
+  },
+
+  // Asignaciones (tarea + usuario) activas cuya fecha limite efectiva (la
+  // propia del usuario si existe, si no la de la tarea) cae dentro de los
+  // proximos `daysAhead` dias. Usado para generar recordatorios.
+  async findUpcomingAssignments(daysAhead) {
+    const result = await pool.query(
+      `SELECT
+         t.id AS tarea_id, t.task_name, t.status,
+         tu.user_id, u.user_name, u.user_email,
+         COALESCE(tu.end_date, t.end_date) AS effective_end_date
+       FROM tarea_usuarios tu
+       JOIN tareas t ON t.id = tu.tarea_id
+       JOIN users u ON u.id = tu.user_id
+       WHERE t.status NOT IN ('completada', 'cancelada')
+         AND COALESCE(tu.end_date, t.end_date) IS NOT NULL
+         AND COALESCE(tu.end_date, t.end_date) BETWEEN CURRENT_DATE AND CURRENT_DATE + $1::int;`,
+      [daysAhead],
+    );
+    return result.rows;
   },
 };

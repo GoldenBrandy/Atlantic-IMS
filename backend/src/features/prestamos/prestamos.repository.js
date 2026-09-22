@@ -3,7 +3,12 @@ import { pool } from "../../config/db.js";
 const SELECT_FIELDS = `
   p.id, p.requesting_user, p.lending_user, p.ficha,
   p.justification, p.loan_type, p.start_date, p.due_date,
-  p.signature_url, p.returned_at
+  p.signature_url, p.returned_at, p.requester_identity_confirmed, p.lender_identity_confirmed, ru.document_number AS requesting_user_document, lu.document_number AS lending_user_document
+`;
+
+const JOINS = `
+  LEFT JOIN users ru ON ru.id = p.requesting_user
+  LEFT JOIN users lu ON lu.id = p.lending_user
 `;
 
 // Agrega los materiales asociados consultando la tabla puente.
@@ -34,6 +39,7 @@ export const prestamoRepository = {
     const result = await pool.query(`
       SELECT ${SELECT_FIELDS}
       FROM prestamos p
+      ${JOINS}
       ORDER BY p.id;
     `);
     return Promise.all(result.rows.map(attachMaterials));
@@ -43,6 +49,7 @@ export const prestamoRepository = {
     const result = await pool.query(
       `SELECT ${SELECT_FIELDS}
        FROM prestamos p
+       ${JOINS}
        WHERE p.id = $1;`,
       [id],
     );
@@ -51,8 +58,17 @@ export const prestamoRepository = {
 
   async create(data) {
     const {
-      materialIds, requestingUser, lendingUser, ficha,
-      justification, loanType, startDate, dueDate, signatureUrl,
+      materialIds,
+      requestingUser,
+      lendingUser,
+      ficha,
+      justification,
+      loanType,
+      startDate,
+      dueDate,
+      signatureUrl,
+      requesterIdentityConfirmed,
+      lenderIdentityConfirmed,
     } = data;
 
     const client = await pool.connect();
@@ -62,11 +78,22 @@ export const prestamoRepository = {
       const insertResult = await client.query(
         `INSERT INTO prestamos (
            requesting_user, lending_user, ficha,
-           justification, loan_type, start_date, due_date, signature_url
+           justification, loan_type, start_date, due_date, signature_url, requester_identity_confirmed, lender_identity_confirmed
          )
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
          RETURNING id;`,
-        [requestingUser || null, lendingUser || null, ficha || null, justification || null, loanType, startDate || null, dueDate || null, signatureUrl || null],
+        [
+          requestingUser || null,
+          lendingUser || null,
+          ficha || null,
+          justification || null,
+          loanType,
+          startDate || null,
+          dueDate || null,
+          signatureUrl || null,
+          Boolean(requesterIdentityConfirmed),
+          Boolean(lenderIdentityConfirmed),
+        ],
       );
       const prestamoId = insertResult.rows[0].id;
 
@@ -89,8 +116,17 @@ export const prestamoRepository = {
 
   async update(id, data) {
     const {
-      materialIds, requestingUser, lendingUser, ficha,
-      justification, loanType, startDate, dueDate, signatureUrl,
+      materialIds,
+      requestingUser,
+      lendingUser,
+      ficha,
+      justification,
+      loanType,
+      startDate,
+      dueDate,
+      signatureUrl,
+      requesterIdentityConfirmed,
+      lenderIdentityConfirmed,
     } = data;
 
     const client = await pool.connect();
@@ -101,18 +137,41 @@ export const prestamoRepository = {
       const query = signatureUrl
         ? `UPDATE prestamos SET
              requesting_user = $1, lending_user = $2, ficha = $3,
-             justification = $4, loan_type = $5, start_date = $6, due_date = $7, signature_url = $8
-           WHERE id = $9
+             justification = $4, loan_type = $5, start_date = $6, due_date = $7, signature_url = $8, requester_identity_confirmed = $9, lender_identity_confirmed = $10
+           WHERE id = $11
            RETURNING id;`
         : `UPDATE prestamos SET
              requesting_user = $1, lending_user = $2, ficha = $3,
-             justification = $4, loan_type = $5, start_date = $6, due_date = $7
-           WHERE id = $8
+             justification = $4, loan_type = $5, start_date = $6, due_date = $7, requester_identity_confirmed = $8, lender_identity_confirmed = $9
+           WHERE id = $10
            RETURNING id;`;
 
       const values = signatureUrl
-        ? [requestingUser || null, lendingUser || null, ficha || null, justification || null, loanType, startDate || null, dueDate || null, signatureUrl, id]
-        : [requestingUser || null, lendingUser || null, ficha || null, justification || null, loanType, startDate || null, dueDate || null, id];
+        ? [
+            requestingUser || null,
+            lendingUser || null,
+            ficha || null,
+            justification || null,
+            loanType,
+            startDate || null,
+            dueDate || null,
+            signatureUrl,
+            Boolean(requesterIdentityConfirmed),
+            Boolean(lenderIdentityConfirmed),
+            id,
+          ]
+        : [
+            requestingUser || null,
+            lendingUser || null,
+            ficha || null,
+            justification || null,
+            loanType,
+            startDate || null,
+            dueDate || null,
+            Boolean(requesterIdentityConfirmed),
+            Boolean(lenderIdentityConfirmed),
+            id,
+          ];
 
       const updateResult = await client.query(query, values);
 
@@ -121,7 +180,10 @@ export const prestamoRepository = {
         return null;
       }
 
-      await client.query(`DELETE FROM prestamos_materiales WHERE prestamo_id = $1;`, [id]);
+      await client.query(
+        `DELETE FROM prestamos_materiales WHERE prestamo_id = $1;`,
+        [id],
+      );
       for (const materialId of materialIds ?? []) {
         await client.query(
           `INSERT INTO prestamos_materiales (prestamo_id, material_id) VALUES ($1,$2);`,

@@ -34,6 +34,7 @@ export const userRepository = {
       isActive,
       isSuperUser,
       isCustodian,
+      mustChangePassword,
     } = userData;
 
 
@@ -59,9 +60,10 @@ export const userRepository = {
         is_staff,
         is_active,
         is_superuser,
-        is_custodian
+        is_custodian,
+        must_change_password
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18, $19)
       RETURNING id;
     `;
 
@@ -87,6 +89,7 @@ export const userRepository = {
       isActive,
       isSuperUser,
       isCustodian ?? false,
+      mustChangePassword ?? false,
     ];
 
 
@@ -286,10 +289,12 @@ export const userRepository = {
   },
 
 
-  // Actualiza unicamente la contrasena de un usuario.
+  // Actualiza unicamente la contrasena de un usuario. Tambien limpia
+  // must_change_password: cambiar la contrasena (propia, con la contrasena
+  // actual) ya cumple el requisito de cambio obligatorio del primer ingreso.
   async updatePassword(id, hashedPassword) {
     const result = await pool.query(
-      `UPDATE users SET password = $1 WHERE id = $2 RETURNING id;`,
+      `UPDATE users SET password = $1, must_change_password = false WHERE id = $2 RETURNING id;`,
       [hashedPassword, id],
     );
     return result.rows[0] ?? null;

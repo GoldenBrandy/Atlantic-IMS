@@ -60,6 +60,7 @@ export default function TareaRegisterForm({
     endDate: "",
     description: "",
     userEndDates: {},
+    progress: 0,
   });
 
   // Precarga los datos de la tarea desde la API cuando se esta editando.
@@ -81,6 +82,7 @@ export default function TareaRegisterForm({
           endDate,
           description: tarea.description ?? "",
           userEndDates,
+          progress: tarea.progress ?? 0,
         });
       })
       .catch((err) => {
@@ -295,6 +297,21 @@ export default function TareaRegisterForm({
                       onChange={handleChange}
                       error={errors.status}
                     />
+
+                    <div>
+                      <label className="mb-1 block text-caption text-black">
+                        Progreso ({formData.progress ?? 0}%)
+                      </label>
+                      <input
+                        type="range"
+                        name="progress"
+                        min="0"
+                        max="100"
+                        value={formData.progress ?? 0}
+                        onChange={handleChange}
+                        className="w-full accent-(--primary-950)"
+                      />
+                    </div>
                   </div>
                 </div>
 
