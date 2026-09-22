@@ -1,6 +1,9 @@
 // URL base del endpoint de inventarios en el backend.
 // Sigue el mismo patron que marcaService.js.
-const API_URL = "http://localhost:4000/api/inventarios";
+// const API_URL = "http://localhost:4000/api/inventarios";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/inventarios`;
 
 export async function getInventarios() {
   const response = await fetch(API_URL);

@@ -1,4 +1,7 @@
-const API_URL = "http://localhost:4000/api/audit-logs";
+// const API_URL = "http://localhost:4000/api/audit-logs";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/audit-logs`;
 
 export async function getAuditLogs() {
   const token = sessionStorage.getItem("token");

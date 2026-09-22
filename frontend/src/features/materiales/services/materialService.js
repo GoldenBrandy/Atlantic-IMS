@@ -1,4 +1,7 @@
-const API_URL = "http://localhost:4000/api/materiales";
+// const API_URL = "http://localhost:4000/api/materiales";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/materiales`;
 
 export async function getMateriales() {
   const response = await fetch(API_URL);

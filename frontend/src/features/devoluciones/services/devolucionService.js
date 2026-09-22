@@ -1,4 +1,7 @@
-const API_URL = "http://localhost:4000/api/devoluciones";
+// const API_URL = "http://localhost:4000/api/devoluciones";
+import { API_URL as BASE_API_URL } from "@/features/config";
+
+const API_URL = `${BASE_API_URL}/devoluciones`;
 
 export async function getDevoluciones() {
   const response = await fetch(API_URL);
