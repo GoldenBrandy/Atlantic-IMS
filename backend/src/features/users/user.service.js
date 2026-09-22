@@ -102,6 +102,8 @@ export const userService = {
       isActive: true,
       isSuperUser: data.isSuperUser ?? false,
       isCustodian: data.isCustodian ?? false,
+      // Si la contraseña se generó automaticamente (no la escribió el admin), se exige cambiarla en el primer ingreso.
+      mustChangePassword: Boolean(generatedPassword),
     };
 
     let created;

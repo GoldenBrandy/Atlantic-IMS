@@ -1,9 +1,12 @@
-import { EllipsisVertical, Eye, Pencil } from "lucide-react";
+import { EllipsisVertical, Eye, Pencil, BadgeCheck } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, ViewDetailsModal } from "@/shared";
 import { formatUserName } from "@/features/users/services/userService";
+import { getCurrentUser } from "@/features/auth";
 import { TASK_STATUS_OPTIONS, USER_TYPE_OPTIONS } from "../services/tareaOptionsService";
+import { viewTarea, verifyTarea } from "../services/tareaService";
+import { sileo } from "sileo";
 
 // Traduce ids de opciones (estado) a su etiqueta visible.
 function findLabel(options, id) {
@@ -36,9 +39,14 @@ function findUserEndDates(ids, endDates, users) {
     .join(", ");
 }
 
-export default function TareaRowActions({ tarea, users = [] }) {
+export default function TareaRowActions({ tarea, users = [], onChange }) {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+
+  const isAssignee = (tarea.assigned_users ?? []).some((id) => String(id) === String(currentUser?.id));
+  const isAssigner = tarea.assigned_by != null && String(tarea.assigned_by) === String(currentUser?.id);
+  const canVerify = isAssigner && tarea.status === "completada" && !tarea.verified_at;
 
   const handleEdit = () => {
     navigate(`/dashboard/tareas/${tarea.id}/edit`);
@@ -48,17 +56,41 @@ export default function TareaRowActions({ tarea, users = [] }) {
     console.log("Eliminar tarea", tarea.id);
   };
 
+  // El asignado (no el asignador) abre la tarea: se avisa a quien la asigno.
+  const handleView = () => {
+    setIsViewOpen(true);
+    if (isAssignee && !isAssigner) {
+      viewTarea(tarea.id).catch(console.error);
+    }
+  };
+
+  const handleVerify = async () => {
+    try {
+      await verifyTarea(tarea.id);
+      sileo.success({ title: "Tarea verificada", description: "Se notificó a los asignados" });
+      onChange?.();
+    } catch (err) {
+      sileo.error({ title: "No se pudo verificar la tarea", description: err?.message || String(err) });
+    }
+  };
+
   const iconButtonClasses = "inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300";
 
   return (
     <div className="flex items-center justify-end gap-1">
-      <button type="button" aria-label="Ver tarea" onClick={() => setIsViewOpen(true)} className={iconButtonClasses}>
+      <button type="button" aria-label="Ver tarea" onClick={handleView} className={iconButtonClasses}>
         <Eye size={18} />
       </button>
 
       <button type="button" aria-label="Editar tarea" onClick={handleEdit} className={iconButtonClasses}>
         <Pencil size={18} />
       </button>
+
+      {canVerify && (
+        <button type="button" aria-label="Verificar tarea" onClick={handleVerify} className={iconButtonClasses}>
+          <BadgeCheck size={18} />
+        </button>
+      )}
 
       <Dropdown>
         <DropdownTrigger>
@@ -69,6 +101,7 @@ export default function TareaRowActions({ tarea, users = [] }) {
 
         <DropdownContent>
           <DropdownItem onClick={handleEdit}>Editar</DropdownItem>
+          {canVerify && <DropdownItem onClick={handleVerify}>Verificar</DropdownItem>}
           <DropdownItem onClick={handleDelete}>Eliminar</DropdownItem>
         </DropdownContent>
       </Dropdown>
@@ -79,8 +112,11 @@ export default function TareaRowActions({ tarea, users = [] }) {
         title={tarea.task_name}
         fields={[
           { label: "Usuario(s)", value: findNames(null, tarea.assigned_users, users, true) },
+          { label: "Asignado por", value: findNames(null, tarea.assigned_by ? [tarea.assigned_by] : [], users, true) },
           { label: "Tipo(s) de usuario", value: findNames(USER_TYPE_OPTIONS, tarea.assigned_user_types, users) },
           { label: "Estado", value: findLabel(TASK_STATUS_OPTIONS, tarea.status) },
+          { label: "Progreso", value: `${tarea.progress ?? 0}%` },
+          { label: "Verificada", value: tarea.verified_at ? `Sí (${String(tarea.verified_at).slice(0, 10)})` : "No" },
           { label: "Fecha inicio", value: String(tarea.start_date ?? "").slice(0, 10) },
           {
             label: tarea.assigned_users?.length > 1 ? "Fecha fin por usuario" : "Fecha fin",

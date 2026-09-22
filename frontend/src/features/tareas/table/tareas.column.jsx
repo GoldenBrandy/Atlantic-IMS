@@ -32,8 +32,10 @@ function findUserEndDates(ids, endDates, users) {
 }
 
 // Genera las columnas de la tabla. Recibe la lista de usuarios ya cargada
-// (via API) para poder traducir assigned_users -> nombres de forma sincrona.
-export function getTareaColumns(users = []) {
+// (via API) para poder traducir assigned_users -> nombres de forma sincrona,
+// y un callback opcional `onChange` para refrescar el listado tras verificar
+// una tarea.
+export function getTareaColumns(users = [], onChange) {
   return [
     {
       accessorKey: "task_name",
@@ -55,6 +57,18 @@ export function getTareaColumns(users = []) {
       cell: ({ row }) => findLabel(TASK_STATUS_OPTIONS, row.original.status),
     },
     {
+      id: "progress",
+      header: "Progreso",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-20 overflow-hidden rounded-full bg-neutral-200">
+            <div className="h-full rounded-full bg-(--primary-950)" style={{ width: `${row.original.progress ?? 0}%` }} />
+          </div>
+          <span className="text-caption">{row.original.progress ?? 0}%</span>
+        </div>
+      ),
+    },
+    {
       id: "startDate",
       header: "Fecha inicio",
       cell: ({ row }) => String(row.original.start_date ?? "").slice(0, 10),
@@ -72,7 +86,7 @@ export function getTareaColumns(users = []) {
     },
     {
       id: "actions",
-      cell: ({ row }) => <TareaRowActions tarea={row.original} users={users} />,
+      cell: ({ row }) => <TareaRowActions tarea={row.original} users={users} onChange={onChange} />,
     },
   ];
 }

@@ -30,7 +30,7 @@ import { sileo } from "sileo";
 // paso ACTUAL tiene errores (los de pasos futuros se validan al llegar).
 const STEP_FIELDS = [
   ["materialIds", "loanType", "ficha"],
-  ["requestingUser", "lendingUser", "startDate", "dueDate"],
+  ["requestingUser", "lendingUser", "startDate", "dueDate", "requesterIdentityConfirmed", "lenderIdentityConfirmed"],
   ["justification"],
   ["signatureUrl"],
 ];
@@ -90,9 +90,15 @@ export default function PrestamoRegisterForm({
     loanType: "",
     startDate: "",
     dueDate: "",
+    requesterIdentityConfirmed: false,
+    lenderIdentityConfirmed: false,
   });
 
-  const [identityConfirmed, setIdentityConfirmed] = useState(false);
+  const toggleRequesterIdentityConfirmed = () => 
+    setFormData((prev) => ({ ...prev, requesterIdentityConfirmed: !prev.requesterIdentityConfirmed }));
+
+  const toggleLenderIdentityConfirmed = () => 
+    setFormData((prev) => ({...prev, lenderIdentityConfirmed: !prev.lenderIdentityConfirmed }));
 
   const [signaturePreview, setSignaturePreview] = useState(null);
   const [signatureFileName, setSignatureFileName] = useState("");
@@ -111,6 +117,8 @@ export default function PrestamoRegisterForm({
           loanType: prestamo.loan_type ?? "",
           startDate: prestamo.start_date ? String(prestamo.start_date).slice(0, 10) : "",
           dueDate: prestamo.due_date ? String(prestamo.due_date).slice(0, 10) : "",
+          requesterIdentityConfirmed: Boolean(prestamo.requester_identity_confirmed),
+          lenderIdentityConfirmed: Boolean(prestamo.lender_identity_confirmed),
         });
         setSignaturePreview(prestamo.signature_url ?? null);
       })
@@ -203,14 +211,15 @@ export default function PrestamoRegisterForm({
           title: "Préstamo actualizado",
           description: "El préstamo se actualizó correctamente",
         });
+        navigate(nextTo);
       } else {
         const res = await createPrestamo(result.data);
         sileo.success({
           title: "Préstamo creado",
           description: res?.message ?? "Préstamo creado correctamente",
         });
+        navigate(`/dashboard/prestamos/${res.prestamoId}/ticket`, { replace: true });
       }
-      navigate(nextTo);
     } catch (err) {
       console.error(err);
       if (err?.field) {
@@ -281,8 +290,7 @@ export default function PrestamoRegisterForm({
                   />
 
                   <Input
-                    label="Ficha de aprendices"
-                    required
+                    label="Ficha de aprendices (opcional) "
                     dense
                     labelClassName={bigLabelClass}
                     name="ficha"
@@ -302,23 +310,37 @@ export default function PrestamoRegisterForm({
                   <h2 className="mb-4 text-base font-semibold">Usuarios involucrados</h2>
 
                   <div className="grid grid-cols-1 gap-4">
-                    <Select
-                      label="Usuario solicitante"
-                      required
-                      dense
-                      labelClassName={bigLabelClass}
-                      name="requestingUser"
-                      startAdornment={<User size={16} />}
-                      options={userOptions}
-                      value={formData.requestingUser}
-                      onChange={handleChange}
-                      error={errors.requestingUser}
-                    />
+                    <div className="flex flex-col gap-2">
+                      <Select
+                        label="Usuario solicitante (opcional)"
+                        dense
+                        labelClassName={bigLabelClass}
+                        name="requestingUser"
+                        startAdornment={<User size={16} />}
+                        options={userOptions}
+                        value={formData.requestingUser}
+                        onChange={handleChange}
+                        error={errors.requestingUser}
+                      />
+
+                      <Button
+                        type="button"
+                        variant={formData.requesterIdentityConfirmed ? "primary" : "secondary"}
+                        size="sm"
+                        className="w-fit gap-2"
+                        onClick={toggleRequesterIdentityConfirmed}
+                      >
+                        {formData.requesterIdentityConfirmed ? <BadgeCheck size={16} /> : <ShieldCheck size={16} />}
+                        {formData.requesterIdentityConfirmed ? "Identidad confirmada" : "Confirmar identidad"}
+                      </Button>
+                      {errors.requesterIdentityConfirmed && (
+                        <p className="text-caption text-red-800">{errors.requesterIdentityConfirmed}</p>
+                      )}
+                    </div>
 
                     <div className="flex flex-col gap-2">
                       <Select
-                        label="Usuario prestador"
-                        required
+                        label="Usuario prestador (opcional)"
                         dense
                         labelClassName={bigLabelClass}
                         name="lendingUser"
@@ -331,14 +353,17 @@ export default function PrestamoRegisterForm({
 
                       <Button
                         type="button"
-                        variant={identityConfirmed ? "primary" : "secondary"}
+                        variant={formData.lenderIdentityConfirmed ? "primary" : "secondary"}
                         size="sm"
                         className="w-fit gap-2"
-                        onClick={() => setIdentityConfirmed((prev) => !prev)}
+                        onClick={toggleLenderIdentityConfirmed}
                       >
-                        {identityConfirmed ? <BadgeCheck size={16} /> : <ShieldCheck size={16} />}
-                        {identityConfirmed ? "Identidad confirmada" : "Confirmar identidad"}
+                        {formData.lenderIdentityConfirmed ? <BadgeCheck size={16} /> : <ShieldCheck size={16} />}
+                        {formData.lenderIdentityConfirmed ? "Identidad confirmada" : "Confirmar identidad"}
                       </Button>
+                      {errors.lenderIdentityConfirmed && (
+                        <p className="text-caption text-red-800">{errors.lenderIdentityConfirmed}</p>
+                      )}
                     </div>
                   </div>
                 </div>
