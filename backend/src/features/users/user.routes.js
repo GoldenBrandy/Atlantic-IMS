@@ -9,6 +9,7 @@ import { Router } from "express";
 // solo delega la ejecución al controller.
 import { userController } from "./user.controller.js";
 import { authenticateToken, requireSuperUser, requireOwnUser } from "../../middlewares/auth.middleware.js";
+import { requiresPermission } from "../../middlewares/permissions.middleware.js";
 
 
 // Creamos una instancia del router de Express
@@ -17,36 +18,38 @@ const router = Router();
 
 // Definimos la ruta para crear un usuario
 // POST /users
-// Cuando se recibe una petición POST en la raíz del recurso,
-// Express ejecuta el método create del controller.
-router.post("/", userController.create);
+// Requiere sesion iniciada y el permiso "create_users" (por grupo o
+// individual; un super administrador siempre pasa, ver access.service.js).
+router.post("/", authenticateToken, requiresPermission("create_users"), userController.create);
 
 
 // Definimos la ruta para listar todos los usuarios
 // GET /users
-// Se usa para poblar selects (responsable, lider, integrantes, etc.) en otros modulos.
-router.get("/", userController.getAll);
+// Solo requiere sesion iniciada (sin permiso granular): se usa para poblar
+// selects (responsable, lider, integrantes, etc.) en pantallas que no son
+// exclusivas de administracion de usuarios.
+router.get("/", authenticateToken, userController.getAll);
 
 
-// Deshabilita varios usuarios a la vez. Solo super administrador.
-router.patch("/bulk-disable", authenticateToken, requireSuperUser, userController.bulkDisable);
+// Deshabilita varios usuarios a la vez. Requiere el permiso "disable_users".
+router.patch("/bulk-disable", authenticateToken, requiresPermission("disable_users"), userController.bulkDisable);
 
 
-// Activa/desactiva un unico usuario (switch individual). Solo super administrador.
-router.patch("/:id/status", authenticateToken, requireSuperUser, userController.setActive);
+// Activa/desactiva un unico usuario (switch individual). Requiere "disable_users".
+router.patch("/:id/status", authenticateToken, requiresPermission("disable_users"), userController.setActive);
 
 
 // Definimos la ruta para obtener un usuario por id
 // GET /users/:id
-// Se usa para precargar el formulario de edicion con los datos actuales.
-router.get("/:id", userController.getById);
+// Solo requiere sesion iniciada: la usa tanto "Ver perfil" (propio usuario)
+// como el formulario de edicion (administracion).
+router.get("/:id", authenticateToken, userController.getById);
 
 
 // Definimos la ruta para actualizar un usuario existente
 // PUT /users/:id
-// Solo un super administrador puede editar nombres/informacion personal de
-// cualquier usuario (incluida la suya propia).
-router.put("/:id", authenticateToken, requireSuperUser, userController.update);
+// Requiere el permiso "edit_users".
+router.put("/:id", authenticateToken, requiresPermission("edit_users"), userController.update);
 
 
 // Cambia unicamente la contrasena del propio usuario autenticado
@@ -56,8 +59,11 @@ router.put("/:id/password", authenticateToken, requireOwnUser, userController.ch
 
 // Definimos las rutas para gestionar los permisos individuales de un usuario
 // (independientes de los permisos que otorga su grupo/tipo de usuario).
-router.get("/:id/permissions", userController.getPermissionsByUserId);
-router.put("/:id/permissions", userController.updateUserPermissions);
+// Solo un super administrador puede ver/otorgar permisos: delegar esto via un
+// permiso granular normal abriria la puerta a que alguien se autoasigne mas
+// permisos de los que su rol deberia tener.
+router.get("/:id/permissions", authenticateToken, requireSuperUser, userController.getPermissionsByUserId);
+router.put("/:id/permissions", authenticateToken, requireSuperUser, userController.updateUserPermissions);
 
 
 // Exportamos el router para ser registrado en la aplicación principal

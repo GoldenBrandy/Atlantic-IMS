@@ -10,7 +10,12 @@ const PERMISSIONS_API_URL = `${API_URL}/permissions`;
 
 
 export async function getGroupPermissions(groupId) {
-  const response = await fetch(`${GROUPS_API_URL}/${groupId}/permissions`);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${GROUPS_API_URL}/${groupId}/permissions`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo los permisos del grupo");
@@ -20,7 +25,12 @@ export async function getGroupPermissions(groupId) {
 }
 
 export async function getAllPermissions() {
-  const response = await fetch(PERMISSIONS_API_URL);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(PERMISSIONS_API_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo los permisos");
@@ -31,7 +41,12 @@ export async function getAllPermissions() {
 
 // Permisos individuales de un usuario (independientes de su grupo/tipo de usuario).
 export async function getUserPermissions(userId) {
-  const response = await fetch(`${USERS_API_URL}/${userId}/permissions`);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${USERS_API_URL}/${userId}/permissions`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo los permisos del usuario");
@@ -41,10 +56,12 @@ export async function getUserPermissions(userId) {
 }
 
 export async function updateUserPermissions(userId, permissionCodenames) {
+  const token = sessionStorage.getItem("token");
   const response = await fetch(`${USERS_API_URL}/${userId}/permissions`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ permissions: permissionCodenames }),
   });
