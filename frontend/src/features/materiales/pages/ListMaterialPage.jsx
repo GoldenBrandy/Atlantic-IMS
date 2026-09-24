@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getMaterialColumns } from "../table/materiales.column.jsx";
 import { getMateriales, bulkDisableMateriales, setMaterialActive } from "../services/materialService.js";
+import { getUsers } from "@/features/users/services/userService";
 import { MATERIAL_TYPE_SLUGS } from "../services/materialTypeService.js";
 import { MATERIAL_REPORT_FIELDS } from "../reports/materialReportFields.js";
 import { sileo } from "sileo";
@@ -13,6 +14,7 @@ export default function ListMaterialPage() {
   const [searchParams] = useSearchParams();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [materiales, setMateriales] = useState([]);
+  const [users, setUsers] = useState([]);
 
   const tipo = searchParams.get("tipo");
 
@@ -29,6 +31,7 @@ export default function ListMaterialPage() {
 
   useEffect(() => {
     loadMateriales();
+    getUsers().then(setUsers).catch(console.error);
   }, [loadMateriales]);
 
   const handleBulkDisable = async (ids) => {
@@ -65,7 +68,7 @@ export default function ListMaterialPage() {
     }
   }, []);
 
-  const materialColumns = useMemo(() => getMaterialColumns(handleToggleStatus), [handleToggleStatus]);
+  const materialColumns = useMemo(() => getMaterialColumns(handleToggleStatus, users), [handleToggleStatus, users]);
 
   const typeLabel = tipo ? (MATERIAL_TYPE_SLUGS[tipo.toLowerCase()] ?? tipo) : null;
 

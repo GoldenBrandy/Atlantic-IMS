@@ -36,7 +36,7 @@ export const materialSchema = z
       .max(50, "La placa SENA es demasiado larga")
       .optional(),
     marca: z.string().optional(),
-    custodian: z.string().optional(),
+    custodianIds: z.array(z.string()).optional(),
     inventario: z.string().optional(),
     location: z.string().max(150, "La ubicación es demasiado larga").optional(),
     purchaseDate: z.string().optional(),
@@ -110,11 +110,11 @@ export const materialSchema = z
       });
     }
 
-    if (isConsumo && !data.custodian) {
+    if (!data.custodianIds || data.custodianIds.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["custodian"],
-        message: "Debe seleccionar un cuentadante",
+        path: ["custodianIds"],
+        message: "Debe seleccionar al menos un cuentadante",
       });
     }
 
