@@ -125,6 +125,16 @@ export const tareaRepository = {
     }
   },
 
+  // El propio asignado marca la tarea como completada (100% de progreso).
+  // No toca fechas, descripcion ni asignaciones (a diferencia de update()).
+  async markComplete(id) {
+    const result = await pool.query(
+      `UPDATE tareas SET status = 'completada', progress = 100 WHERE id = $1 RETURNING id, status, progress;`,
+      [id],
+    );
+    return result.rows[0] ?? null;
+  },
+
   // Marca la tarea como verificada por el asignador (solo se llama luego de
   // confirmar en el service que quien verifica es el asignador y que la
   // tarea esta "completada").

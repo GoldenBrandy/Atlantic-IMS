@@ -1,49 +1,34 @@
 import { useState, useEffect } from "react";
-import { getCurrentUser, isSuperUser } from "@/features/auth";
+import { useNavigate } from "react-router-dom";
+import { ListChecks, Mail } from "lucide-react";
+import { getCurrentUser } from "@/features/auth";
 import { getUserById } from "../services/userService";
 import { getGroups } from "@/features/access/services/groupService";
 import { getDocumentTypes } from "../services/selectService";
-import UserRegisterForm from "../components/UserRegisterForm";
+import { getSupportEmail } from "@/features/settings/services/settingsService";
 import ProfileView from "../components/ProfileView";
 import ChangePasswordForm from "../components/ChangePasswordForm";
+import { Button } from "@/shared";
 import { sileo } from "sileo";
 
+// "Ver perfil" siempre es de solo lectura, sin importar el rol: para editar
+// la informacion personal de un usuario se usa la gestion de usuarios
+// (lista de usuarios -> editar). Aqui solo se puede ver los datos, cambiar
+// la contraseña propia y entrar a "Mis tareas".
 export default function ProfilePage() {
   const currentUser = getCurrentUser();
   const userId = currentUser?.id ?? null;
-  const canEditPersonalInfo = isSuperUser();
+  const navigate = useNavigate();
 
-  // El super administrador puede editar su propia informacion personal,
-  // igual que la de cualquier otro usuario: reutiliza el formulario completo.
-  if (canEditPersonalInfo) {
-    return (
-      <div className="w-full flex justify-center">
-        <UserRegisterForm
-          userId={userId}
-          title="Mi perfil"
-          subtitle="Actualiza tu información personal"
-          nextTo="/dashboard"
-          cancelTo="/dashboard"
-          showBackButton={true}
-          backTo="/dashboard"
-        />
-      </div>
-    );
-  }
-
-  return <ReadOnlyProfile userId={userId} />;
-}
-
-// Vista de solo lectura para cualquier usuario que no sea super administrador:
-// puede ver sus datos pero solo puede cambiar su contraseña.
-function ReadOnlyProfile({ userId }) {
   const [user, setUser] = useState(null);
   const [groups, setGroups] = useState([]);
   const [documentTypes, setDocumentTypes] = useState([]);
+  const [supportEmail, setSupportEmail] = useState("");
 
   useEffect(() => {
     getGroups().then((data) => setGroups(Array.isArray(data) ? data : [])).catch(console.error);
     getDocumentTypes().then(setDocumentTypes).catch(console.error);
+    getSupportEmail().then(setSupportEmail).catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -67,13 +52,38 @@ function ReadOnlyProfile({ userId }) {
     <div className="relative min-h-full w-full flex-1 overflow-hidden p-6">
       <div className="relative text-black [&_h1]:text-black [&_input]:text-black [&_input::placeholder]:text-black/70 [&_label]:text-black [&_select]:text-black [&_span]:text-black">
         <div className="mx-auto w-full max-w-6xl">
-          <h1 className="mb-1 text-center text-2xl font-semibold">Mi perfil</h1>
-          <p className="mb-6 text-center text-sm text-black">
-            Solo un super administrador puede modificar tu información personal. Aquí puedes cambiar tu contraseña.
-          </p>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="mb-1 text-2xl font-semibold">Mi perfil</h1>
+              <p className="text-sm text-black">
+                Para modificar tu información personal, hazlo desde la gestión de usuarios. Aquí puedes ver tus datos y cambiar tu contraseña.
+              </p>
+            </div>
+
+            <Button
+              variant="secondary"
+              type="button"
+              className="gap-2"
+              onClick={() => navigate("/dashboard/mis-tareas")}
+            >
+              <ListChecks size={16} />
+              Mis tareas
+            </Button>
+          </div>
 
           <div className="flex flex-col gap-6">
             <ProfileView user={user} groupName={groupName} documentTypeLabel={documentTypeLabel} />
+
+            {supportEmail && (
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h2 className="mb-4 text-base font-semibold">¿Necesitas ayuda?</h2>
+                <p className="flex items-center gap-2 text-sm text-black/80">
+                  <Mail size={16} />
+                  Escribe a soporte: <span className="font-medium">{supportEmail}</span>
+                </p>
+              </div>
+            )}
+
             <ChangePasswordForm userId={userId} />
           </div>
         </div>
