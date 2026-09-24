@@ -10,10 +10,11 @@ function findLabel(options, id) {
   return options.find((option) => option.id === id)?.label ?? id;
 }
 
-// Nombre + numero de documento del participante, o "-" si no se selecciono
-// ninguno (ambos campos son opcionales).
-function describeParticipant(users, id, documentNumber) {
-  if (!id) return "-";
+// Nombre + numero de documento del participante. Si no se selecciono un
+// usuario registrado (id vacio), usa el correo del solicitante como
+// identificador; si tampoco hay correo, "-".
+function describeParticipant(users, id, documentNumber, email) {
+  if (!id) return email || "-";
   const user = users.find((user) => String(user.id) === String(id));
   const name = user ? formatUserName(user) : id;
   return documentNumber ? `${name} (Doc. ${documentNumber})` : name;
@@ -26,7 +27,7 @@ export function buildTicketFields(prestamo, users = []) {
     { label: "Ítem(s) prestado(s)", value: (prestamo.materials ?? []).map((material) => material.name).join(", ") || "-" },
     {
       label: "Usuario solicitante",
-      value: describeParticipant(users, prestamo.requesting_user, prestamo.requesting_user_document),
+      value: describeParticipant(users, prestamo.requesting_user, prestamo.requesting_user_document, prestamo.requester_email),
     },
     {
       label: "Usuario prestador",

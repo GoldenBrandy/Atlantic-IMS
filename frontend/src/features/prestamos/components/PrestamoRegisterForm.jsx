@@ -12,6 +12,7 @@ import {
   Repeat,
   User,
   UserCheck,
+  Mail,
   IdCard,
   CalendarDays,
   CalendarCheck,
@@ -30,7 +31,7 @@ import { sileo } from "sileo";
 // paso ACTUAL tiene errores (los de pasos futuros se validan al llegar).
 const STEP_FIELDS = [
   ["materialIds", "loanType", "ficha"],
-  ["requestingUser", "lendingUser", "startDate", "dueDate", "requesterIdentityConfirmed", "lenderIdentityConfirmed"],
+  ["requestingUser", "requesterEmail", "lendingUser", "startDate", "dueDate", "requesterIdentityConfirmed", "lenderIdentityConfirmed"],
   ["justification"],
   ["signatureUrl"],
 ];
@@ -84,6 +85,7 @@ export default function PrestamoRegisterForm({
   const [formData, setFormData] = useState({
     materialIds: [],
     requestingUser: "",
+    requesterEmail: "",
     lendingUser: "",
     ficha: "",
     justification: "",
@@ -111,6 +113,7 @@ export default function PrestamoRegisterForm({
         setFormData({
           materialIds: (prestamo.material_ids ?? []).map(String),
           requestingUser: prestamo.requesting_user ? String(prestamo.requesting_user) : "",
+          requesterEmail: prestamo.requester_email ?? "",
           lendingUser: prestamo.lending_user ? String(prestamo.lending_user) : "",
           ficha: prestamo.ficha ?? "",
           justification: prestamo.justification ?? "",
@@ -249,7 +252,7 @@ export default function PrestamoRegisterForm({
 
         <div className="mx-auto w-full max-w-5xl">
           <h1 className="mb-1 text-center text-2xl font-semibold">
-            {isEditing ? "Editar préstamo" : "Nuevo préstamo"}
+            {isEditing ? `Editar préstamo #${prestamoId}` : "Nuevo préstamo"}
           </h1>
           <p className="mb-6 text-center text-sm text-black">
             Completa la información del préstamo
@@ -322,6 +325,21 @@ export default function PrestamoRegisterForm({
                         onChange={handleChange}
                         error={errors.requestingUser}
                       />
+
+                      {!formData.requestingUser && (
+                        <Input
+                          label="Correo del solicitante (persona sin cuenta registrada)"
+                          dense
+                          labelClassName={bigLabelClass}
+                          name="requesterEmail"
+                          type="email"
+                          placeholder="correo@ejemplo.com"
+                          startAdornment={<Mail size={16} />}
+                          value={formData.requesterEmail}
+                          onChange={handleChange}
+                          error={errors.requesterEmail}
+                        />
+                      )}
 
                       <Button
                         type="button"
