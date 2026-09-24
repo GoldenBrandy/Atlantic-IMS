@@ -25,6 +25,17 @@ export const authController = {
     }
   },
 
+  async verifyResetCode(req, res) {
+    try {
+      const result = await authService.verifyResetCode(req.body);
+      res.status(200).json(result);
+    } catch (error) {
+      res
+        .status(error.statusCode ?? 400)
+        .json({ error: error.message, field: error.field });
+    }
+  },
+
   async resetPassword(req, res) {
     try {
       const result = await authService.resetPassword(req.body);
