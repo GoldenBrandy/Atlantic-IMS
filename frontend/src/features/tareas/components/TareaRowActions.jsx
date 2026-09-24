@@ -1,7 +1,7 @@
 import { EllipsisVertical, Eye, Pencil, BadgeCheck } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, ViewDetailsModal } from "@/shared";
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, ViewDetailsModal, IconButton } from "@/shared";
 import { formatUserName } from "@/features/users/services/userService";
 import { getCurrentUser } from "@/features/auth";
 import { TASK_STATUS_OPTIONS, USER_TYPE_OPTIONS } from "../services/tareaOptionsService";
@@ -74,29 +74,27 @@ export default function TareaRowActions({ tarea, users = [], onChange }) {
     }
   };
 
-  const iconButtonClasses = "inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300";
-
   return (
     <div className="flex items-center justify-end gap-1">
-      <button type="button" aria-label="Ver tarea" onClick={handleView} className={iconButtonClasses}>
+      <IconButton ariaLabel="Ver tarea" variant="ghost" hitSize={36} iconSize={18} onClick={handleView}>
         <Eye size={18} />
-      </button>
+      </IconButton>
 
-      <button type="button" aria-label="Editar tarea" onClick={handleEdit} className={iconButtonClasses}>
+      <IconButton ariaLabel="Editar tarea" variant="ghost" hitSize={36} iconSize={18} onClick={handleEdit}>
         <Pencil size={18} />
-      </button>
+      </IconButton>
 
       {canVerify && (
-        <button type="button" aria-label="Verificar tarea" onClick={handleVerify} className={iconButtonClasses}>
+        <IconButton ariaLabel="Verificar tarea" variant="ghost" hitSize={36} iconSize={18} onClick={handleVerify}>
           <BadgeCheck size={18} />
-        </button>
+        </IconButton>
       )}
 
       <Dropdown>
         <DropdownTrigger>
-          <button type="button" aria-label="Acciones de tarea" className={iconButtonClasses}>
+          <IconButton ariaLabel="Acciones de tarea" variant="ghost" hitSize={36} iconSize={18}>
             <EllipsisVertical size={18} />
-          </button>
+          </IconButton>
         </DropdownTrigger>
 
         <DropdownContent>
