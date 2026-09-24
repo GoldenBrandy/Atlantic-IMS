@@ -203,7 +203,7 @@ export default function ForgotPassword({ backTo = "/auth" }) {
         </IconButton>
       </div>
 
-      <div className="mx-auto grid w-full max-w-md gap-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mx-auto grid w-full max-w-md gap-6 rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
         {step === "email" && (
           <form className="grid gap-6" onSubmit={handleSendCode} noValidate>
             <div>

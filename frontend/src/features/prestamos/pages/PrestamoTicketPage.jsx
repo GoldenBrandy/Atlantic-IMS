@@ -45,7 +45,7 @@ export default function PrestamoTicketPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {fields.map((field) => (
                 <div key={field.label}>

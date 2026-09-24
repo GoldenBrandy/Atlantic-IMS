@@ -385,7 +385,7 @@ export default function UserRegisterForm({
             autoComplete="off"
           >
             {currentStep === 0 && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Información General</h2>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-[auto_1fr]">
@@ -482,7 +482,7 @@ export default function UserRegisterForm({
             )}
 
             {currentStep === 1 && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Contacto</h2>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -558,7 +558,7 @@ export default function UserRegisterForm({
             )}
 
             {currentStep === 2 && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Rol y Vinculación</h2>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -627,7 +627,7 @@ export default function UserRegisterForm({
             )}
 
             {currentStep === 3 && !isEditing && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Tareas asignadas (opcional)</h2>
 
                 {pendingTasks.length > 0 && (

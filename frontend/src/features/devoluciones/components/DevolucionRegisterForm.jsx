@@ -163,7 +163,7 @@ export default function DevolucionRegisterForm({
           </p>
 
           <form className="flex flex-col gap-6" onSubmit={handleSubmit} noValidate autoComplete="off">
-            <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
               <h2 className="mb-4 text-base font-semibold">Préstamo a devolver</h2>
 
               <div className="grid grid-cols-1 gap-4">
@@ -197,7 +197,7 @@ export default function DevolucionRegisterForm({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
               <h2 className="mb-4 text-base font-semibold">Detalle de la devolución</h2>
 
               <Select

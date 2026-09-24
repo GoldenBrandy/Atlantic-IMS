@@ -262,7 +262,7 @@ export default function PrestamoRegisterForm({
 
           <form className="flex flex-col gap-6" onSubmit={handleSubmit} noValidate autoComplete="off">
             {currentStep === 0 && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Información General</h2>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -309,7 +309,7 @@ export default function PrestamoRegisterForm({
 
             {currentStep === 1 && (
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                   <h2 className="mb-4 text-base font-semibold">Usuarios involucrados</h2>
 
                   <div className="grid grid-cols-1 gap-4">
@@ -386,7 +386,7 @@ export default function PrestamoRegisterForm({
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                   <h2 className="mb-4 text-base font-semibold">Fechas</h2>
 
                   <div className="grid grid-cols-1 gap-4">
@@ -421,7 +421,7 @@ export default function PrestamoRegisterForm({
             )}
 
             {currentStep === 2 && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Justificación</h2>
 
                 <Input
@@ -440,7 +440,7 @@ export default function PrestamoRegisterForm({
             )}
 
             {currentStep === 3 && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Legalización</h2>
 
                 <div className="flex flex-col gap-2">

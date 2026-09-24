@@ -571,7 +571,7 @@ export default function MaterialRegisterForm({
     }
   };
 
-  const cardClass = "rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm";
+  const cardClass = "rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm";
   const isLastStep = currentStep === steps.length - 1;
 
   return (
