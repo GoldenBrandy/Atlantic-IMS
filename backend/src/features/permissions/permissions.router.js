@@ -2,10 +2,13 @@
 
 import { Router } from "express";
 import { permissionsController } from "./permissions.controller.js";
+import { authenticateToken, requireSuperUser } from "../../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.get("/", permissionsController.getAll);
+// Solo un super administrador administra el catalogo de permisos (misma
+// razon que las rutas de permisos de usuarios/grupos).
+router.get("/", authenticateToken, requireSuperUser, permissionsController.getAll);
 
 export default router;
 

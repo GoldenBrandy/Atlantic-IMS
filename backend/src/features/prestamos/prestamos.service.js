@@ -13,6 +13,7 @@ function mapPayload(data) {
     requestingUser: toId(data.requestingUser),
     lendingUser: toId(data.lendingUser),
     ficha: data.ficha || null,
+    requesterEmail: data.requesterEmail || null,
     justification: data.justification,
     loanType: data.loanType,
     startDate: data.startDate,
@@ -45,6 +46,12 @@ export const prestamoService = {
       const error = new Error("Debe seleccionar al menos un ítem a prestar");
       error.statusCode = 400;
       error.field = "materialIds";
+      throw error;
+    }
+    if (!data.requestingUser && !data.requesterEmail) {
+      const error = new Error("Debe seleccionar un usuario solicitante registrado o indicar su correo electrónico");
+      error.statusCode = 400;
+      error.field = "requesterEmail";
       throw error;
     }
     if (!data.requesterIdentityConfirmed){

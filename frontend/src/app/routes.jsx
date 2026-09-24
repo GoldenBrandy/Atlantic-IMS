@@ -8,7 +8,7 @@ import { ListMaterialPage, CreateMaterialPage, EditMaterialPage } from '@/featur
 import { CreateGrupoPage, ListGruposPage, EditGrupoPage } from '@/features/grupos';
 import { CreateProductoPage, ListProductosPage, EditProductoPage } from '@/features/productos';
 import { CreateMarcaPage, ListMarcasPage, EditMarcaPage } from '@/features/marcas';
-import { CreateTareaPage, ListTareasPage, EditTareaPage } from '@/features/tareas';
+import { CreateTareaPage, ListTareasPage, EditTareaPage, MisTareasPage } from '@/features/tareas';
 import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage, PrestamoTicketPage } from '@/features/prestamos';
 import { CreateDevolucionPage } from '@/features/devoluciones';
 import { ListInventariosPage, CreateInventarioPage, EditInventarioPage } from '@/features/inventarios';
@@ -60,6 +60,7 @@ const router = createBrowserRouter([
             { index: true, element: <DashboardHomePage /> },
             { path: "usuarios/crear", element: <CreateUserPage /> },
             { path: "perfil", element: <ProfilePage /> },
+            { path: "mis-tareas", element: <MisTareasPage /> },
             { path: "cambiar-contrasena", element: <ForcePasswordChangePage /> },
             { path: "permisos", element: <AccessPage /> },
             { path: "userList", element: <ListUserPage /> },

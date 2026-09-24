@@ -4,7 +4,7 @@
 // (sin websockets) cada 30 segundos.
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
-import { Dropdown, DropdownTrigger, DropdownContent } from "@/shared";
+import { Dropdown, DropdownTrigger, DropdownContent, IconButton } from "@/shared";
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "../services/notificationService";
 import { getToken } from "@/features/auth";
 
@@ -58,23 +58,19 @@ export default function NotificationBell() {
   return (
     <Dropdown>
       <DropdownTrigger>
-        <button
-          type="button"
-          aria-label="Notificaciones"
-          className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300"
-        >
+        <IconButton ariaLabel="Notificaciones" variant="ghost" hitSize={48} iconSize={20} className="relative">
           <Bell size={20} />
           {unreadCount > 0 && (
             <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
-        </button>
+        </IconButton>
       </DropdownTrigger>
 
-      <DropdownContent className="w-80 max-w-[90vw] p-0">
-        <div className="flex items-center justify-between border-b border-neutral-100 px-3 py-2">
-          <p className="text-caption font-semibold">Notificaciones</p>
+      <DropdownContent className="w-96 max-w-[90vw] p-0">
+        <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
+          <p className="text-sm font-semibold">Notificaciones</p>
           {unreadCount > 0 && (
             <button type="button" onClick={handleMarkAllAsRead} className="text-caption text-(--primary-950) underline">
               Marcar todas como leídas
@@ -82,20 +78,20 @@ export default function NotificationBell() {
           )}
         </div>
 
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <p className="px-3 py-4 text-center text-caption text-neutral-500">No tienes notificaciones</p>
+            <p className="px-4 py-8 text-center text-sm text-neutral-500">No tienes notificaciones</p>
           ) : (
             notifications.map((notification) => (
               <button
                 key={notification.id}
                 type="button"
                 onClick={() => handleOpenNotification(notification)}
-                className={`block w-full border-b border-neutral-50 px-3 py-2 text-left transition-colors last:border-b-0 hover:bg-neutral-50 ${
+                className={`block w-full border-b border-neutral-50 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-neutral-50 ${
                   notification.is_read ? "" : "bg-blue-50/60"
                 }`}
               >
-                <p className="text-caption">{notification.message}</p>
+                <p className="text-sm">{notification.message}</p>
                 <p className="mt-0.5 text-[11px] text-neutral-400">{timeAgo(notification.created_at)}</p>
               </button>
             ))

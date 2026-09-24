@@ -1,8 +1,11 @@
-import { ChevronDown, LogOut, User } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, LogOut, Mail, ShieldCheck, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import GlobalSearch from "./GlobalSearch";
 import AppsMenu from "./AppsMenu";
 import { NotificationBell } from "@/features/notifications";
+import { isSuperUser } from "@/features/auth";
+import SupportEmailModal from "@/features/settings/components/SupportEmailModal";
 import {
   Dropdown,
   DropdownContent,
@@ -13,6 +16,7 @@ import logo_1 from "@/assets/images/logo_1.png";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [isSupportEmailOpen, setIsSupportEmailOpen] = useState(false);
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
@@ -50,16 +54,27 @@ export default function Navbar() {
                 <DropdownContent>
                   {/* Item que navega al perfil del usuario. */}
                   <DropdownItem>
-                    <Link to="/dashboard/perfil" className="block w-full">
+                    <Link to="/dashboard/perfil" className="flex w-full items-center gap-2">
+                      <User size={16} />
                       Ver perfil
                     </Link>
                   </DropdownItem>
                   {/* Item que navega a gestion de permisos. */}
                   <DropdownItem>
-                    <Link to="/dashboard/permisos" className="block w-full">
+                    <Link to="/dashboard/permisos" className="flex w-full items-center gap-2">
+                      <ShieldCheck size={16} />
                       Gestion Permisos
                     </Link>
                   </DropdownItem>
+                  {/* Solo el super administrador puede cambiar el correo de soporte. */}
+                  {isSuperUser() && (
+                    <DropdownItem onClick={() => setIsSupportEmailOpen(true)}>
+                      <span className="inline-flex items-center gap-2">
+                        <Mail size={16} />
+                        Correo de soporte
+                      </span>
+                    </DropdownItem>
+                  )}
                   {/* Item que ejecuta cierre de sesion. */}
                   <DropdownItem onClick={handleLogout}>
                     <span className="inline-flex items-center gap-2">
@@ -73,6 +88,8 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      <SupportEmailModal isOpen={isSupportEmailOpen} onClose={() => setIsSupportEmailOpen(false)} />
     </nav>
   );
 }

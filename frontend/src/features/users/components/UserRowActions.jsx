@@ -7,6 +7,7 @@ import {
   DropdownContent,
   DropdownItem,
   ViewDetailsModal,
+  IconButton,
 } from "@/shared";
 import { isSuperUser } from "@/features/auth";
 
@@ -35,48 +36,31 @@ export default function UserRowActions({ user, groups = [] }) {
     console.log("Eliminar usuario", user.id);
   };
 
-  const iconButtonClasses =
-    "inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300";
-
   const fullName = [user.user_name, user.last_name_1].filter(Boolean).join(" ");
 
   return (
     <div className="flex items-center justify-end gap-1">
-      <button
-        type="button"
-        aria-label="Ver usuario"
-        onClick={() => setIsViewOpen(true)}
-        className={iconButtonClasses}
-      >
+      <IconButton ariaLabel="Ver usuario" variant="ghost" hitSize={36} iconSize={18} onClick={() => setIsViewOpen(true)}>
         <Eye size={18} />
-      </button>
+      </IconButton>
 
       {canEdit && (
-        <button
-          type="button"
-          aria-label="Editar usuario"
-          onClick={handleEdit}
-          className={iconButtonClasses}
-        >
+        <IconButton ariaLabel="Editar usuario" variant="ghost" hitSize={36} iconSize={18} onClick={handleEdit}>
           <Pencil size={18} />
-        </button>
+        </IconButton>
       )}
 
       {canEdit && needsRenewal && (
-        <button type="button" aria-label="Renovar usuario" onClick={handleRenew} className={iconButtonClasses}>
+        <IconButton ariaLabel="Renovar usuario" variant="ghost" hitSize={36} iconSize={18} onClick={handleRenew}>
           <RefreshCw size={18} />
-        </button>
+        </IconButton>
       )}
 
       <Dropdown>
         <DropdownTrigger>
-          <button
-            type="button"
-            aria-label="Acciones de usuario"
-            className={iconButtonClasses}
-          >
+          <IconButton ariaLabel="Acciones de usuario" variant="ghost" hitSize={36} iconSize={18}>
             <EllipsisVertical size={18} />
-          </button>
+          </IconButton>
         </DropdownTrigger>
 
         <DropdownContent>

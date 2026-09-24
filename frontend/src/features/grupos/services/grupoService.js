@@ -12,14 +12,24 @@ function normalize(group) {
 }
 
 export async function getGrupos() {
-  const response = await fetch(API_URL);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(API_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   if (!response.ok) throw new Error("Error obteniendo los grupos");
   const data = await response.json();
   return data.map(normalize);
 }
 
 export async function getGrupoById(id) {
-  const response = await fetch(`${API_URL}/${id}`);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${API_URL}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.error || "Grupo no encontrado");

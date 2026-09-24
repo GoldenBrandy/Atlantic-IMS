@@ -17,6 +17,7 @@ import {
   Boxes,
 } from "lucide-react";
 import { isSuperUser } from "@/features/auth";
+import { IconButton } from "../ui/IconButton";
 
 // Modulos disponibles en el panel de accesos rapidos del navbar (estilo
 // selector de apps de Google). Reemplaza la lista larga de enlaces para no
@@ -67,20 +68,22 @@ export default function AppsMenu() {
 
   return (
     <div ref={wrapperRef} className="relative">
-      <button
-        type="button"
+      <IconButton
+        ariaLabel="Módulos"
+        variant="ghost"
+        hitSize={48}
+        iconSize={22}
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-haspopup="true"
-        aria-label="Módulos"
-        className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+        className="hover:text-neutral-900"
       >
         <LayoutGrid size={22} />
-      </button>
+      </IconButton>
 
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-2xl border border-neutral-200 bg-white p-4 shadow-lg shadow-black/10">
-          <p className="mb-3 px-1 text-caption font-semibold text-neutral-500">Módulos</p>
+          <p className="mb-3 px-1 text-small font-semibold text-neutral-500">Módulos</p>
           <div className="grid grid-cols-3 gap-1">
             {MODULES.filter((module) => !module.superUserOnly || isSuperUser()).map((module) => (
               <button

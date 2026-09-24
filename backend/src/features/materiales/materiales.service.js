@@ -42,7 +42,9 @@ function mapPayload(data) {
       : [],
     senaPlate: data.senaPlate ?? null,
     marcaId: toId(data.marcaId ?? data.marca),
-    custodianId: toId(data.custodianId ?? data.custodian),
+    custodianIds: Array.isArray(data.custodianIds)
+      ? data.custodianIds.map(toId).filter((id) => id !== null)
+      : [],
     inventarioId: toId(data.inventarioId ?? data.inventario),
     location: data.location ?? null,
     purchaseDate: data.purchaseDate || null,

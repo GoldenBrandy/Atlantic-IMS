@@ -3,7 +3,7 @@
 import { EllipsisVertical, Eye, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, ViewDetailsModal } from "@/shared";
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, ViewDetailsModal, IconButton } from "@/shared";
 
 export default function InventarioRowActions({ inventario }) {
   const [isViewOpen, setIsViewOpen] = useState(false);
@@ -13,23 +13,21 @@ export default function InventarioRowActions({ inventario }) {
     navigate(`/dashboard/inventarios/${inventario.id}/edit`);
   };
 
-  const iconButtonClasses = "inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300";
-
   return (
     <div className="flex items-center justify-end gap-1">
-      <button type="button" aria-label="Ver inventario" onClick={() => setIsViewOpen(true)} className={iconButtonClasses}>
+      <IconButton ariaLabel="Ver inventario" variant="ghost" hitSize={36} iconSize={18} onClick={() => setIsViewOpen(true)}>
         <Eye size={18} />
-      </button>
+      </IconButton>
 
-      <button type="button" aria-label="Editar inventario" onClick={handleEdit} className={iconButtonClasses}>
+      <IconButton ariaLabel="Editar inventario" variant="ghost" hitSize={36} iconSize={18} onClick={handleEdit}>
         <Pencil size={18} />
-      </button>
+      </IconButton>
 
       <Dropdown>
         <DropdownTrigger>
-          <button type="button" aria-label="Acciones de inventario" className={iconButtonClasses}>
+          <IconButton ariaLabel="Acciones de inventario" variant="ghost" hitSize={36} iconSize={18}>
             <EllipsisVertical size={18} />
-          </button>
+          </IconButton>
         </DropdownTrigger>
 
         <DropdownContent>

@@ -68,6 +68,20 @@ export async function viewTarea(id) {
   return response.json();
 }
 
+// El asignado marca su propia tarea como completada.
+export async function markTareaComplete(id) {
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${API_URL}/${id}/complete`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || "Error al marcar la tarea como completada");
+  }
+  return response.json();
+}
+
 // El asignador verifica una tarea "completada".
 export async function verifyTarea(id) {
   const token = sessionStorage.getItem("token");

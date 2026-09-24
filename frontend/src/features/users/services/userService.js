@@ -11,7 +11,12 @@ export function formatUserName(user) {
 }
 
 export async function getUsers() {
-  const response = await fetch(USERS_API_URL);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(USERS_API_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo los usuarios");
@@ -42,7 +47,12 @@ export async function createUser(userData) {
 }
 
 export async function getUserById(userId) {
-  const response = await fetch(`${USERS_API_URL}/${userId}`);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${USERS_API_URL}/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     const error = await response.json();

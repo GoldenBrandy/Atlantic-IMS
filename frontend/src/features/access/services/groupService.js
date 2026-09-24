@@ -5,7 +5,12 @@ const GROUPS_API_URL = `${API_URL}/groups`;
 
 
 export async function getGroups() {
-  const response = await fetch(GROUPS_API_URL);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(GROUPS_API_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo los grupos");

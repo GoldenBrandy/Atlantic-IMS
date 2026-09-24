@@ -7,8 +7,10 @@ import {
   DropdownContent,
   DropdownItem,
   ViewDetailsModal,
+  IconButton,
 } from "@/shared";
 import { MATERIAL_CATEGORY_OPTIONS } from "../services/materialTypeService";
+import { formatUserName } from "@/features/users/services/userService";
 
 const currencyFormatter = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -21,13 +23,25 @@ function findCategoryLabel(id) {
   return MATERIAL_CATEGORY_OPTIONS.find((option) => option.id === id)?.label ?? id;
 }
 
-export default function MaterialRowActions({ material }) {
+// Traduce ids de cuentadantes a nombres, usando la lista de usuarios ya cargada.
+function findCustodianNames(custodianIds, users) {
+  if (!custodianIds?.length) return null;
+  return custodianIds
+    .map((id) => {
+      const user = users.find((user) => String(user.id) === String(id));
+      return user ? formatUserName(user) : null;
+    })
+    .filter(Boolean)
+    .join(", ");
+}
+
+export default function MaterialRowActions({ material, users = [] }) {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const navigate = useNavigate();
   const isConsumo = material.type === "Consumo";
   const isDevolutivo = material.type === "Devolutivo";
   const showExtendedFields = isConsumo || isDevolutivo;
-  const custodianName = [material.custodian_name, material.custodian_last_name].filter(Boolean).join(" ");
+  const custodianNames = findCustodianNames(material.custodian_ids, users);
 
   const handleEdit = () => {
     navigate(`/dashboard/materiales/${material.id}/edit`);
@@ -37,38 +51,21 @@ export default function MaterialRowActions({ material }) {
     console.log("Eliminar material", material.id);
   };
 
-  const iconButtonClasses =
-    "inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300";
-
   return (
     <div className="flex items-center justify-end gap-1">
-      <button
-        type="button"
-        aria-label="Ver material"
-        onClick={() => setIsViewOpen(true)}
-        className={iconButtonClasses}
-      >
+      <IconButton ariaLabel="Ver material" variant="ghost" hitSize={36} iconSize={18} onClick={() => setIsViewOpen(true)}>
         <Eye size={18} />
-      </button>
+      </IconButton>
 
-      <button
-        type="button"
-        aria-label="Editar material"
-        onClick={handleEdit}
-        className={iconButtonClasses}
-      >
+      <IconButton ariaLabel="Editar material" variant="ghost" hitSize={36} iconSize={18} onClick={handleEdit}>
         <Pencil size={18} />
-      </button>
+      </IconButton>
 
       <Dropdown>
         <DropdownTrigger>
-          <button
-            type="button"
-            aria-label="Acciones de material"
-            className={iconButtonClasses}
-          >
+          <IconButton ariaLabel="Acciones de material" variant="ghost" hitSize={36} iconSize={18}>
             <EllipsisVertical size={18} />
-          </button>
+          </IconButton>
         </DropdownTrigger>
 
         <DropdownContent>
@@ -139,7 +136,7 @@ export default function MaterialRowActions({ material }) {
                 { label: "Valor Total", value: material.total_value ? currencyFormatter.format(material.total_value) : null },
               ]
             : []),
-          ...(isConsumo ? [{ label: "Cuentadante", value: custodianName || null }] : []),
+          ...(showExtendedFields ? [{ label: "Cuentadante(s)", value: custodianNames || null }] : []),
           ...(isDevolutivo
             ? [
                 { label: "Modelo", value: material.model },

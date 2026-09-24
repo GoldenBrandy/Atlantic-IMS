@@ -11,6 +11,7 @@ router.get("/:id", tareaController.getById);
 router.post("/", authenticateToken, tareaController.create);
 router.put("/:id", authenticateToken, tareaController.update);
 router.patch("/:id/view", authenticateToken, tareaController.registerView);
+router.patch("/:id/complete", authenticateToken, tareaController.markComplete);
 router.patch("/:id/verify", authenticateToken, tareaController.verify);
 
 export default router;

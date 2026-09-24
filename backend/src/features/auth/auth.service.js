@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { authRepository } from "./auth.repository.js";
+import { settingsService } from "../settings/settings.service.js";
 import { generateVerificationCode } from "../../utils/generateCode.js";
 import {
   sendVerificationCodeEmail,
@@ -136,9 +137,12 @@ export const authService = {
 
     await authRepository.createAccessRequest({ fullName, email, reason });
 
-    sendAccessRequestEmail({ to: process.env.SUPPORT_EMAIL, fullName, email, reason }).catch((err) =>
-      console.error("Error enviando solicitud de acceso:", err),
-    );
+    settingsService
+      .getSupportEmail()
+      .then((supportEmail) =>
+        sendAccessRequestEmail({ to: supportEmail || process.env.SUPPORT_EMAIL, fullName, email, reason }),
+      )
+      .catch((err) => console.error("Error enviando solicitud de acceso:", err));
 
     return {
       message:

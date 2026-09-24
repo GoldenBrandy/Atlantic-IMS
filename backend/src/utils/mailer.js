@@ -1,64 +1,81 @@
-// Envio de correo. Todavia no hay un proveedor SMTP configurado, asi que por
-// ahora el "envio" solo se registra en la consola del backend con el contenido
-// completo del correo. Para activar el envio real:
-//   1. npm install nodemailer
-//   2. Agregar SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD al .env
-//   3. Reemplazar el cuerpo de sendPasswordEmail por una llamada real a nodemailer.
+// Envio de correo real via SMTP (Brevo). Si las variables de entorno SMTP_*
+// no estan configuradas (ej. en un entorno sin credenciales todavia), el
+// envio se simula y queda registrado en la consola, igual que antes.
+import nodemailer from "nodemailer";
+
+const SMTP_HOST = process.env.SMTP_HOST;
+const SMTP_PORT = process.env.SMTP_PORT;
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASSWORD = process.env.SMTP_PASSWORD;
+const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER;
+
+const isConfigured = Boolean(SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD);
+
+const transporter = isConfigured
+  ? nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: Number(SMTP_PORT),
+      secure: Number(SMTP_PORT) === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+    })
+  : null;
+
+async function sendEmail({ to, subject, text }) {
+  if (!transporter) {
+    console.log("\n================ CORREO SIMULADO (SMTP no configurado) ================");
+    console.log(`Para: ${to}`);
+    console.log(`Asunto: ${subject}`);
+    console.log(`Cuerpo: ${text}`);
+    console.log("=========================================================================\n");
+    return { simulated: true };
+  }
+
+  await transporter.sendMail({ from: SMTP_FROM, to, subject, text });
+  return { simulated: false };
+}
 
 export async function sendPasswordEmail({ to, name, password }) {
-  console.log("\n================ CORREO SIMULADO (no enviado) ================");
-  console.log(`Para: ${to}`);
-  console.log(`Asunto: Bienvenido/a ${name} - Tu contraseña de acceso`);
-  console.log(
-    `Cuerpo: Hola ${name}, se creó tu cuenta. Tu contraseña generada automáticamente es: ${password}\n` +
+  return sendEmail({
+    to,
+    subject: `Bienvenido/a ${name} - Tu contraseña de acceso`,
+    text:
+      `Hola ${name}, se creó tu cuenta. Tu contraseña generada automáticamente es: ${password}\n` +
       "Te recomendamos cambiarla luego de tu primer inicio de sesión.",
-  );
-  console.log("=================================================================\n");
-
-  return { simulated: true };
+  });
 }
 
 // Codigo de verificacion de 8 digitos para restablecer la contrasena
 // olvidada (pantalla "Ingresar con código de acceso").
 export async function sendVerificationCodeEmail({ to, name, code }) {
-  console.log("\n============= CORREO SIMULADO (no enviado) ===============");
-  console.log(`Para: ${to}`);
-  console.log("Asunto: Tu código de verificación");
-  console.log(`Cuerpo: Hola ${name || ""}, tu código de verificación de 8 dígitos es: ${code}\n` + 
-    "Este código vence en 10 minutos.",
-  );
-  console.log
-  ("=================================================================\n");
-
-  return { simulated: true };
+  return sendEmail({
+    to,
+    subject: "Tu código de verificación",
+    text:
+      `Hola ${name || ""}, tu código de verificación de 8 dígitos es: ${code}\n` +
+      "Este código vence en 10 minutos.",
+  });
 }
 
 // Notifica al correo de soporte que alguien pidio acceso al sistema (no hay
 // auto-registro publico: el admin debe crear la cuenta manualmente).
 export async function sendAccessRequestEmail({ to, fullName, email, reason }) {
-  console.log("\n================ CORREO SIMULADO (no enviado) ================");
-  console.log(`Para: ${to}`);
-  console.log("Asunto: Nueva solicitud de acceso");
-  console.log(
-    `Cuerpo: ${fullName} (${email}) solicitó acceso al sistema.\n` +
+  return sendEmail({
+    to,
+    subject: `Nueva solicitud de acceso - ${fullName}`,
+    text:
+      "Nueva solicitud de acceso al sistema:\n\n" +
+      `Nombre: ${fullName}\n` +
+      `Correo: ${email}\n` +
       `Motivo: ${reason || "No especificado"}`,
-  );
-  console.log("=================================================================\n");
-
-  return { simulated: true };
+  });
 }
 
 // Recordatorio de fecha limite de una tarea (ademas de la notificacion
 // in-app, ver notifications feature).
 export async function sendTaskReminderEmail({ to, name, taskName, endDate }) {
-  console.log("\n============ CORREO SIMULADO (no enviado) =================");
-  console.log(`Para: ${to}`);
-  console.log(`Asunto: Recordatorio: "${taskName}" vence pronto`);
-  console.log
-  (`Cuerpo: Hola ${name || ""}, te recordamos que la tarea "${taskName}" vence el ${endDate}.`,
-  );
-  console.log
-  ("===================================================================\n");
-
-  return { simulated: true };
+  return sendEmail({
+    to,
+    subject: `Recordatorio: "${taskName}" vence pronto`,
+    text: `Hola ${name || ""}, te recordamos que la tarea "${taskName}" vence el ${endDate}.`,
+  });
 }

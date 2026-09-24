@@ -58,6 +58,17 @@ export const tareaController = {
     }
   },
 
+  // El asignado marca su propia tarea como completada.
+  async markComplete(req, res) {
+    try {
+      const result = await tareaService.markComplete(req.params.id, req.user.id);
+      res.status(200).json({ message: "Tarea marcada como completada", tareaId: result.id });
+    } catch (err) {
+      console.error("ERROR BACKEND:", err);
+      res.status(err.statusCode ?? 400).json({ error: err.message });
+    }
+  },
+
   // El asignador verifica una tarea "completada".
   async verify(req, res) {
     try {

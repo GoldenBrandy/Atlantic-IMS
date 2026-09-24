@@ -21,6 +21,7 @@ import devolucionRoutes from "./devoluciones/devoluciones.routes.js";
 import inventarioRoutes from "./inventarios/inventarios.routes.js";
 import auditLogsRoutes from "./auditLogs/auditLogs.routes.js";
 import notificationsRoutes from "./notifications/notifications.routes.js";
+import settingsRoutes from "./settings/settings.routes.js";
 import { auditLogMiddleware } from "../middlewares/auditLog.middleware.js";
 
 // Creamos la instancia principal de la aplicaciÃ³n Express
@@ -72,6 +73,7 @@ app.use("/api/devoluciones", devolucionRoutes);
 app.use("/api/inventarios", inventarioRoutes);
 app.use("/api/audit-logs", auditLogsRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // Manejador de errores global: evita que Express responda con su pagina
 // de error HTML por defecto (rompe el .json() del frontend) ante fallos

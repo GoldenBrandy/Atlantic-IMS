@@ -71,6 +71,39 @@ export const tareaService = {
     return { notified: true };
   },
 
+  // Un asignado marca su propia tarea como completada. Notifica a quien la
+  // asigno para que la verifique (no la marca como verificada: eso lo sigue
+  // haciendo el asignador por separado con verifyTarea).
+  async markComplete(tareaId, actorId) {
+    const tarea = await tareaRepository.findById(tareaId);
+    if (!tarea) throw new Error("Tarea no encontrada");
+
+    const isAssignee = (tarea.assigned_users ?? []).some((id) => String(id) === String(actorId));
+    if (!isAssignee) {
+      const error = new Error("Solo un asignado puede marcar esta tarea como completada");
+      error.statusCode = 403;
+      throw error;
+    }
+    if (tarea.status === "cancelada") {
+      const error = new Error("No se puede completar una tarea cancelada");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const updated = await tareaRepository.markComplete(tareaId);
+
+    if (tarea.assigned_by && String(tarea.assigned_by) !== String(actorId)) {
+      await notificationRepository.create({
+        userId: tarea.assigned_by,
+        type: "task_completed",
+        message: `La tarea "${tarea.task_name}" fue marcada como completada`,
+        tareaId,
+      });
+    }
+
+    return updated;
+  },
+
   // El asignador verifica una tarea que ya esta "completada". Notifica a
   // cada asignado.
   async verifyTarea(tareaId, actorId) {

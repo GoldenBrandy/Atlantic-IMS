@@ -5,7 +5,7 @@ import { createMaterial, updateMaterial, getMaterialById } from "../services/mat
 import { getMarcas } from "@/features/marcas/services/marcaService";
 import { getInventarios } from "@/features/inventarios/services/inventarioService";
 import { getUsers, formatUserName } from "@/features/users/services/userService";
-import { Input, Button, Select, IconButton, StepIndicator, bigLabelClass } from "@/shared";
+import { Input, Button, Select, IconButton, MultiSelectField, StepIndicator, bigLabelClass } from "@/shared";
 import { useNavigate } from "react-router-dom";
 import {
   Upload,
@@ -37,7 +37,7 @@ const EXTENDED_STEPS = ["Información General", "Inventario", "Valores"];
 const SIMPLE_STEPS = ["Información General", "Detalles adicionales"];
 
 const EXTENDED_STEP_FIELDS = [
-  ["materialName", "model", "senaPlate", "category", "externalId", "marca", "custodian", "materialDescription", "technicalSheetImages", "quotations"],
+  ["materialName", "model", "senaPlate", "category", "externalId", "marca", "custodianIds", "materialDescription", "technicalSheetImages", "quotations"],
   ["materialQuantity", "location", "purchaseDate"],
   ["unitValue"],
 ];
@@ -253,7 +253,7 @@ export default function MaterialRegisterForm({
     isActive: true,
     senaPlate: "",
     marca: "",
-    custodian: "",
+    custodianIds: [],
     inventario: "",
     location: "",
     purchaseDate: "",
@@ -290,8 +290,8 @@ export default function MaterialRegisterForm({
     if (!showExtendedFields) return;
     getMarcas().then(setMarcas).catch(console.error);
     getInventarios().then(setInventarios).catch(console.error);
-    if (isConsumo) getUsers().then(setUsers).catch(console.error);
-  }, [showExtendedFields, isConsumo]);
+    getUsers().then(setUsers).catch(console.error);
+  }, [showExtendedFields]);
 
   const marcaOptions = useMemo(
     () => [{ id: "", label: "Selecciona una marca" }, ...marcas.map((marca) => ({ id: String(marca.id), label: marca.name }))],
@@ -305,10 +305,7 @@ export default function MaterialRegisterForm({
 
   // Solo se puede elegir como cuentadante a un usuario marcado como tal en su registro (checkbox "Es cuentadante").
   const custodianOptions = useMemo(
-    () => [
-      { id: "", label: "Selecciona un cuentadante" },
-      ...users.filter((user) => user.is_custodian).map((user) => ({ id: String(user.id), label: formatUserName(user) })),
-    ],
+    () => users.filter((user) => user.is_custodian).map((user) => ({ id: String(user.id), label: formatUserName(user) })),
     [users],
   );
 
@@ -330,7 +327,7 @@ export default function MaterialRegisterForm({
           isActive: material.is_active ?? true,
           senaPlate: material.sena_plate ?? "",
           marca: material.marca_id ? String(material.marca_id) : "",
-          custodian: material.custodian_id ? String(material.custodian_id) : "",
+          custodianIds: (material.custodian_ids ?? []).map(String),
           inventario: material.inventario_id ? String(material.inventario_id) : "",
           location: material.location ?? "",
           purchaseDate: material.purchase_date ? String(material.purchase_date).slice(0, 10) : "",
@@ -459,6 +456,15 @@ export default function MaterialRegisterForm({
     if (name === "materialType") setCurrentStep(0);
   };
 
+  const toggleCustodian = (userId) => {
+    setFormData((prev) => ({
+      ...prev,
+      custodianIds: prev.custodianIds.includes(userId)
+        ? prev.custodianIds.filter((id) => id !== userId)
+        : [...prev.custodianIds, userId],
+    }));
+  };
+
   const computedTotalValue = (Number(formData.materialQuantity) || 0) * (Number(formData.unitValue) || 0);
 
   const [errors, setErrors] = useState({});
@@ -530,7 +536,7 @@ export default function MaterialRegisterForm({
         quotations: quotationPreviews,
         senaPlate: result.data.senaPlate,
         marca: result.data.marca,
-        custodian: result.data.custodian,
+        custodianIds: result.data.custodianIds,
         inventario: result.data.inventario,
         location: result.data.location,
         purchaseDate: result.data.purchaseDate,
@@ -710,20 +716,18 @@ export default function MaterialRegisterForm({
                           error={errors.inventario}
                         />
 
-                        {isConsumo && (
-                          <Select
-                            label="Cuentadante"
-                            required
-                            dense
-                            labelClassName={bigLabelClass}
-                            name="custodian"
-                            startAdornment={<UserCog size={16} />}
-                            options={custodianOptions}
-                            value={formData.custodian}
-                            onChange={handleChange}
-                            error={errors.custodian}
-                          />
-                        )}
+                        <MultiSelectField
+                          label="Cuentadante(s)"
+                          required
+                          dense
+                          labelClassName={bigLabelClass}
+                          icon={UserCog}
+                          placeholder="Selecciona uno o más cuentadantes"
+                          options={custodianOptions}
+                          selected={formData.custodianIds}
+                          onToggle={toggleCustodian}
+                          error={errors.custodianIds}
+                        />
 
                         <div className="sm:col-span-2 lg:col-span-4">
                           <Input

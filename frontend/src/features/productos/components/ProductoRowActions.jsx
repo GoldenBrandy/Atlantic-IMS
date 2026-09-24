@@ -7,6 +7,7 @@ import {
   DropdownContent,
   DropdownItem,
   ViewDetailsModal,
+  IconButton,
 } from "@/shared";
 import { formatUserName } from "@/features/users/services/userService";
 import { PRODUCT_TYPE_OPTIONS, CATEGORY_OPTIONS } from "../services/productoOptionsService";
@@ -32,23 +33,21 @@ export default function ProductoRowActions({ producto, users = [] }) {
     console.log("Eliminar producto", producto.id);
   };
 
-  const iconButtonClasses = "inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300";
-
   return (
     <div className="flex items-center justify-end gap-1">
-      <button type="button" aria-label="Ver producto" onClick={() => setIsViewOpen(true)} className={iconButtonClasses}>
+      <IconButton ariaLabel="Ver producto" variant="ghost" hitSize={36} iconSize={18} onClick={() => setIsViewOpen(true)}>
         <Eye size={18} />
-      </button>
+      </IconButton>
 
-      <button type="button" aria-label="Editar producto" onClick={handleEdit} className={iconButtonClasses}>
+      <IconButton ariaLabel="Editar producto" variant="ghost" hitSize={36} iconSize={18} onClick={handleEdit}>
         <Pencil size={18} />
-      </button>
+      </IconButton>
 
       <Dropdown>
         <DropdownTrigger>
-          <button type="button" aria-label="Acciones de producto" className={iconButtonClasses}>
+          <IconButton ariaLabel="Acciones de producto" variant="ghost" hitSize={36} iconSize={18}>
             <EllipsisVertical size={18} />
-          </button>
+          </IconButton>
         </DropdownTrigger>
 
         <DropdownContent>

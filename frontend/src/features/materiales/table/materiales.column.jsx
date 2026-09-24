@@ -1,6 +1,7 @@
 import { Switch } from "@/shared";
 import MaterialRowActions from "../components/MaterialRowActions";
 import { MATERIAL_CATEGORY_OPTIONS } from "../services/materialTypeService";
+import { formatUserName } from "@/features/users/services/userService";
 
 const currencyFormatter = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -17,9 +18,21 @@ function muted(value) {
   return value === null || value === undefined || value === "" ? <span className="text-neutral-400">-</span> : value;
 }
 
+// Traduce ids de cuentadantes a nombres, usando la lista de usuarios ya cargada.
+function findCustodianNames(custodianIds, users) {
+  if (!custodianIds?.length) return null;
+  return custodianIds
+    .map((id) => {
+      const user = users.find((user) => String(user.id) === String(id));
+      return user ? formatUserName(user) : null;
+    })
+    .filter(Boolean)
+    .join(", ");
+}
+
 // Genera las columnas de la tabla. onToggleStatus(material, nextValue) se
 // llama cuando se cambia el switch de una fila individual (no masivo).
-export function getMaterialColumns(onToggleStatus) {
+export function getMaterialColumns(onToggleStatus, users = []) {
   return [
     {
       accessorKey: "id",
@@ -65,12 +78,8 @@ export function getMaterialColumns(onToggleStatus) {
     },
     {
       id: "custodian",
-      header: "Cuentadante",
-      cell: ({ row }) => {
-        const material = row.original;
-        const name = [material.custodian_name, material.custodian_last_name].filter(Boolean).join(" ");
-        return muted(name || null);
-      },
+      header: "Cuentadante(s)",
+      cell: ({ row }) => muted(findCustodianNames(row.original.custodian_ids, users)),
     },
     {
       accessorKey: "quantity",
@@ -117,7 +126,7 @@ export function getMaterialColumns(onToggleStatus) {
     },
     {
       id: "actions",
-      cell: ({ row }) => <MaterialRowActions material={row.original} />,
+      cell: ({ row }) => <MaterialRowActions material={row.original} users={users} />,
     },
   ];
 }

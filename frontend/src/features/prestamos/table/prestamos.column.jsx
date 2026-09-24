@@ -19,6 +19,10 @@ function findUserName(users, id) {
 export function getPrestamoColumns(users = []) {
   return [
     {
+      accessorKey: "id",
+      header: "Id",
+    },
+    {
       id: "material",
       header: "Ítem(s) prestado(s)",
       cell: ({ row }) => {
@@ -33,8 +37,8 @@ export function getPrestamoColumns(users = []) {
     },
     {
       id: "requestingUserDocument",
-      header: "N.° documento",
-      cell: ({ row }) => row.original.requesting_user_document || "-",
+      header: "N.° documento / Correo",
+      cell: ({ row }) => row.original.requesting_user_document || row.original.requester_email || "-",
     },
     {
       id: "lendingUser",

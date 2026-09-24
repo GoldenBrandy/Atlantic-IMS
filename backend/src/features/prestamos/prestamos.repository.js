@@ -1,7 +1,7 @@
 import { pool } from "../../config/db.js";
 
 const SELECT_FIELDS = `
-  p.id, p.requesting_user, p.lending_user, p.ficha,
+  p.id, p.requesting_user, p.lending_user, p.ficha, p.requester_email,
   p.justification, p.loan_type, p.start_date, p.due_date,
   p.signature_url, p.returned_at, p.requester_identity_confirmed, p.lender_identity_confirmed, ru.document_number AS requesting_user_document, lu.document_number AS lending_user_document
 `;
@@ -62,6 +62,7 @@ export const prestamoRepository = {
       requestingUser,
       lendingUser,
       ficha,
+      requesterEmail,
       justification,
       loanType,
       startDate,
@@ -77,15 +78,16 @@ export const prestamoRepository = {
 
       const insertResult = await client.query(
         `INSERT INTO prestamos (
-           requesting_user, lending_user, ficha,
+           requesting_user, lending_user, ficha, requester_email,
            justification, loan_type, start_date, due_date, signature_url, requester_identity_confirmed, lender_identity_confirmed
          )
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
          RETURNING id;`,
         [
           requestingUser || null,
           lendingUser || null,
           ficha || null,
+          requesterEmail || null,
           justification || null,
           loanType,
           startDate || null,
@@ -120,6 +122,7 @@ export const prestamoRepository = {
       requestingUser,
       lendingUser,
       ficha,
+      requesterEmail,
       justification,
       loanType,
       startDate,
@@ -136,14 +139,14 @@ export const prestamoRepository = {
       // La firma solo se sobreescribe si llega una nueva; de lo contrario se conserva la existente.
       const query = signatureUrl
         ? `UPDATE prestamos SET
-             requesting_user = $1, lending_user = $2, ficha = $3,
-             justification = $4, loan_type = $5, start_date = $6, due_date = $7, signature_url = $8, requester_identity_confirmed = $9, lender_identity_confirmed = $10
-           WHERE id = $11
+             requesting_user = $1, lending_user = $2, ficha = $3, requester_email = $4,
+             justification = $5, loan_type = $6, start_date = $7, due_date = $8, signature_url = $9, requester_identity_confirmed = $10, lender_identity_confirmed = $11
+           WHERE id = $12
            RETURNING id;`
         : `UPDATE prestamos SET
-             requesting_user = $1, lending_user = $2, ficha = $3,
-             justification = $4, loan_type = $5, start_date = $6, due_date = $7, requester_identity_confirmed = $8, lender_identity_confirmed = $9
-           WHERE id = $10
+             requesting_user = $1, lending_user = $2, ficha = $3, requester_email = $4,
+             justification = $5, loan_type = $6, start_date = $7, due_date = $8, requester_identity_confirmed = $9, lender_identity_confirmed = $10
+           WHERE id = $11
            RETURNING id;`;
 
       const values = signatureUrl
@@ -151,6 +154,7 @@ export const prestamoRepository = {
             requestingUser || null,
             lendingUser || null,
             ficha || null,
+            requesterEmail || null,
             justification || null,
             loanType,
             startDate || null,
@@ -164,6 +168,7 @@ export const prestamoRepository = {
             requestingUser || null,
             lendingUser || null,
             ficha || null,
+            requesterEmail || null,
             justification || null,
             loanType,
             startDate || null,
