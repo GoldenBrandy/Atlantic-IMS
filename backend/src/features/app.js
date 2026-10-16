@@ -38,12 +38,19 @@ const allowedOrigins = [
   "http://grupo3.ricoprogramar.com",
 ];
 const localhostRegex = /^https?:\/\/localhost(?::\d+)?$/;
+// Tunel temporal (cloudflared) para que alguien fuera de la red local pueda
+// usar el proyecto corriendo en una maquina de desarrollo sin tener el codigo.
+const quickTunnelRegex = /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/;
 
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin) || localhostRegex.test(origin))
+      if (
+        allowedOrigins.includes(origin) ||
+        localhostRegex.test(origin) ||
+        quickTunnelRegex.test(origin)
+      )
         return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
