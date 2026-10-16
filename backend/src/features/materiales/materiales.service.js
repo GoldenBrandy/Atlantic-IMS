@@ -30,15 +30,8 @@ function mapPayload(data) {
     technicalSheetUrls: Array.isArray(data.technicalSheetUrls)
       ? data.technicalSheetUrls.filter(Boolean)
       : [],
-    quotations: Array.isArray(data.quotations)
-      ? data.quotations
-          .filter((q) => q?.url)
-          .map((q) => ({
-            url: q.url,
-            value:
-              q.value !== undefined && q.value !== "" ? Number(q.value) : null,
-            date: q.date || null,
-          }))
+    cotizacionIds: Array.isArray(data.cotizacionIds)
+      ? data.cotizacionIds.map(toId).filter((id) => id !== null)
       : [],
     senaPlate: data.senaPlate ?? null,
     marcaId: toId(data.marcaId ?? data.marca),

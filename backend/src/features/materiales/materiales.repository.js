@@ -2,7 +2,7 @@ import { pool } from "../../config/db.js";
 
 const SELECT_FIELDS = `
   m.id, m.name, m.type, m.quantity, m.description, m.is_active, m.image_urls,
-  m.technical_sheet_urls, m.quotations, m.sena_plate, m.location, m.purchase_date, m.entry_date, m.unit_value, m.total_value,
+  m.technical_sheet_urls, m.sena_plate, m.location, m.purchase_date, m.entry_date, m.unit_value, m.total_value,
   m.model, m.external_id,
   m.marca_id, ma.name AS marca_name,
   m.inventario_id, inv.name AS inventario_name,
@@ -19,6 +19,30 @@ async function attachCustodians(material) {
   return { ...material, custodian_ids: result.rows.map((row) => row.user_id) };
 }
 
+// Agrega las cotizaciones asociadas (hasta 3) consultando la tabla puente,
+// con los datos ya resueltos (nombre, archivo, fecha) para no tener que
+// pedirlos aparte en el frontend.
+async function attachCotizaciones(material) {
+  if (!material) return material;
+  const result = await pool.query(
+    `SELECT c.id, c.name, c.file_url, c.quotation_date
+     FROM material_cotizaciones mc
+     JOIN cotizaciones c ON c.id = mc.cotizacion_id
+     WHERE mc.material_id = $1
+     ORDER BY c.id;`,
+    [material.id],
+  );
+  return {
+    ...material,
+    cotizacion_ids: result.rows.map((row) => row.id),
+    cotizaciones: result.rows,
+  };
+}
+
+async function attachRelations(material) {
+  return attachCotizaciones(await attachCustodians(material));
+}
+
 export const materialRepository = {
   async findAll() {
     const result = await pool.query(`
@@ -29,7 +53,7 @@ export const materialRepository = {
       LEFT JOIN categorias cat ON cat.id = m.categoria_id
       ORDER BY m.id;
     `);
-    return Promise.all(result.rows.map(attachCustodians));
+    return Promise.all(result.rows.map(attachRelations));
   },
 
   async findById(id) {
@@ -42,13 +66,13 @@ export const materialRepository = {
        WHERE m.id = $1;`,
       [id],
     );
-    return attachCustodians(result.rows[0] ?? null);
+    return attachRelations(result.rows[0] ?? null);
   },
 
   async create(data) {
     const {
       name, type, quantity, description, isActive, imageUrls,
-      technicalSheetUrls, quotations, senaPlate, marcaId, custodianIds, inventarioId,
+      technicalSheetUrls, senaPlate, marcaId, custodianIds, inventarioId, cotizacionIds,
       location, purchaseDate, entryDate, unitValue, totalValue,
       model, categoriaId, externalId,
     } = data;
@@ -60,15 +84,15 @@ export const materialRepository = {
       const insertResult = await client.query(
         `INSERT INTO materiales (
            name, type, quantity, description, is_active, image_urls,
-           technical_sheet_urls, quotations, sena_plate, marca_id, inventario_id,
+           technical_sheet_urls, sena_plate, marca_id, inventario_id,
            location, purchase_date, entry_date, unit_value, total_value,
            model, categoria_id, external_id
          )
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
          RETURNING id;`,
         [
           name, type, quantity, description || null, isActive, imageUrls?.length ? imageUrls : null,
-          technicalSheetUrls?.length ? technicalSheetUrls : null, quotations?.length ? JSON.stringify(quotations) : null,
+          technicalSheetUrls?.length ? technicalSheetUrls : null,
           senaPlate || null, marcaId || null, inventarioId || null,
           location || null, purchaseDate || null, entryDate || null, unitValue ?? null, totalValue ?? null,
           model || null, categoriaId || null, externalId || null,
@@ -80,6 +104,13 @@ export const materialRepository = {
         await client.query(
           `INSERT INTO material_custodios (material_id, user_id) VALUES ($1,$2);`,
           [materialId, userId],
+        );
+      }
+
+      for (const cotizacionId of cotizacionIds ?? []) {
+        await client.query(
+          `INSERT INTO material_cotizaciones (material_id, cotizacion_id) VALUES ($1,$2);`,
+          [materialId, cotizacionId],
         );
       }
 
@@ -99,7 +130,7 @@ export const materialRepository = {
   async update(id, data) {
     const {
       name, type, quantity, description, imageUrls,
-      technicalSheetUrls, quotations, senaPlate, marcaId, custodianIds, inventarioId,
+      technicalSheetUrls, senaPlate, marcaId, custodianIds, inventarioId, cotizacionIds,
       location, purchaseDate, entryDate, unitValue, totalValue,
       model, categoriaId, externalId,
     } = data;
@@ -111,14 +142,14 @@ export const materialRepository = {
       const updateResult = await client.query(
         `UPDATE materiales SET
            name = $1, type = $2, quantity = $3, description = $4, image_urls = $5,
-           technical_sheet_urls = $6, quotations = $7, sena_plate = $8, marca_id = $9, inventario_id = $10,
-           location = $11, purchase_date = $12, entry_date = $13, unit_value = $14, total_value = $15,
-           model = $16, categoria_id = $17, external_id = $18
-         WHERE id = $19
+           technical_sheet_urls = $6, sena_plate = $7, marca_id = $8, inventario_id = $9,
+           location = $10, purchase_date = $11, entry_date = $12, unit_value = $13, total_value = $14,
+           model = $15, categoria_id = $16, external_id = $17
+         WHERE id = $18
          RETURNING id;`,
         [
           name, type, quantity, description || null, imageUrls?.length ? imageUrls : null,
-          technicalSheetUrls?.length ? technicalSheetUrls : null, quotations?.length ? JSON.stringify(quotations) : null,
+          technicalSheetUrls?.length ? technicalSheetUrls : null,
           senaPlate || null, marcaId || null, inventarioId || null,
           location || null, purchaseDate || null, entryDate || null, unitValue ?? null, totalValue ?? null,
           model || null, categoriaId || null, externalId || null,
@@ -136,6 +167,14 @@ export const materialRepository = {
         await client.query(
           `INSERT INTO material_custodios (material_id, user_id) VALUES ($1,$2);`,
           [id, userId],
+        );
+      }
+
+      await client.query(`DELETE FROM material_cotizaciones WHERE material_id = $1;`, [id]);
+      for (const cotizacionId of cotizacionIds ?? []) {
+        await client.query(
+          `INSERT INTO material_cotizaciones (material_id, cotizacion_id) VALUES ($1,$2);`,
+          [id, cotizacionId],
         );
       }
 

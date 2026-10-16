@@ -105,17 +105,16 @@ export default function MaterialRowActions({ material, users = [] }) {
                 },
                 {
                   label: "Cotizaciones",
-                  value: material.quotations?.length ? (
+                  value: material.cotizaciones?.length ? (
                     <div className="flex flex-col gap-1">
-                      {material.quotations.map((quotation, index) => (
-                        <div key={index} className="flex flex-wrap items-center gap-2">
-                          <a href={quotation.url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
-                            Ver cotización {index + 1}
+                      {material.cotizaciones.map((cotizacion) => (
+                        <div key={cotizacion.id} className="flex flex-wrap items-center gap-2">
+                          <a href={cotizacion.file_url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
+                            {cotizacion.name}
                           </a>
-                          {quotation.value != null && (
-                            <span className="text-caption text-neutral-600">{currencyFormatter.format(quotation.value)}</span>
+                          {cotizacion.quotation_date && (
+                            <span className="text-caption text-neutral-600">{String(cotizacion.quotation_date).slice(0, 10)}</span>
                           )}
-                          {quotation.date && <span className="text-caption text-neutral-600">{quotation.date}</span>}
                         </div>
                       ))}
                     </div>

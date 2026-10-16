@@ -6,6 +6,7 @@ import { createMaterial, updateMaterial, getMaterialById } from "../services/mat
 import { getMarcas } from "@/features/marcas/services/marcaService";
 import { getInventarios } from "@/features/inventarios/services/inventarioService";
 import CreateInventarioModal from "@/features/inventarios/components/CreateInventarioModal";
+import SelectCotizacionModal from "@/features/cotizaciones/components/SelectCotizacionModal";
 import { getUsers, formatUserName } from "@/features/users/services/userService";
 import { Input, Button, Select, IconButton, MultiSelectField, StepIndicator, bigLabelClass } from "@/shared";
 import { useNavigate } from "react-router-dom";
@@ -41,7 +42,7 @@ const EXTENDED_STEPS = ["Información General", "Inventario", "Valores"];
 const SIMPLE_STEPS = ["Información General", "Detalles adicionales"];
 
 const EXTENDED_STEP_FIELDS = [
-  ["materialName", "model", "senaPlate", "category", "externalId", "marca", "custodianIds", "materialDescription", "technicalSheetImages", "quotations"],
+  ["materialName", "model", "senaPlate", "category", "externalId", "marca", "custodianIds", "materialDescription", "technicalSheetImages", "cotizacionIds"],
   ["materialQuantity", "location", "purchaseDate"],
   ["unitValue"],
 ];
@@ -156,80 +157,51 @@ function TechnicalSheetPicker({ previews, onAdd, onRemove, max, required, error 
   );
 }
 
-// Selector de 1 a `max` cotizaciones en PDF. A diferencia de la ficha
-// tecnica (imagenes), cada cotizacion guarda ademas su valor y su fecha (no
-// solo el PDF), para poder calcular el promedio de las que tengan <=90 dias.
-
-function QuotationPicker({ quotations, onAdd, onRemove, onValueChange, onDateChange, max, error }) {
-  const inputRef = useRef(null);
-
-  const handleChange = (e) => {
-    const files = Array.from(e.target.files || []).filter((file) => file.type === "application/pdf");
-    if (files.length < e.target.files.length) {
-      sileo.error({
-        title: "Formato no permitido",
-        description: "Las cotizaciones solo se aceptan en formato PDF",
-      });
-    }
-    if (files.length) onAdd(files);
-    e.target.value = "";
-  };
-
+// Selector de hasta `max` cotizaciones ya guardadas en el modulo de
+// Cotizaciones (reutilizables entre materiales). El "+" abre un popup para
+// elegir una existente o subir una nueva desde la computadora.
+function QuotationPicker({ selected, onOpenPicker, onRemove, max, error }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <p className="text-sm font-semibold text-black">
-        Cotizaciones <span className="font-normal text-neutral-400">(obligatorio, 1 a {max}; valor y fecha de cada una)</span>
+        Cotizaciones <span className="font-normal text-neutral-400">(obligatorio, selecciona hasta {max})</span>
       </p>
 
       <div className="flex flex-col gap-2">
-        {quotations.map((quotation, index) => (
-          <div key={index} className="flex flex-wrap items-center gap-2 rounded-lg border bg-neutral-50 p-2">
+        {selected.map((cotizacion) => (
+          <div key={cotizacion.id} className="flex flex-wrap items-center gap-2 rounded-lg border bg-neutral-50 p-2">
             <FileText size={18} className="shrink-0 text-red-600" />
-            <a href={quotation.url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
-              Ver PDF {index + 1}
+            <a href={cotizacion.file_url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
+              {cotizacion.name}
             </a>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Valor cotizado"
-              value={quotation.value}
-              onChange={(e) => onValueChange(index, e.target.value)}
-              className="h-8 w-32 rounded border border-black/20 px-2 text-caption text-black"
-            />
-            <input
-              type="date"
-              value={quotation.date}
-              onChange={(e) => onDateChange(index, e.target.value)}
-              className="h-8 rounded border border-black/20 px-2 text-caption text-black"
-            />
+            {cotizacion.quotation_date && (
+              <span className="text-caption text-neutral-500">{String(cotizacion.quotation_date).slice(0, 10)}</span>
+            )}
             <button
               type="button"
               aria-label="Quitar cotización"
-              onClick={() => onRemove(index)}
+              onClick={() => onRemove(cotizacion.id)}
               className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/60 text-white"
-            >            
+            >
               <X size={12} />
             </button>
           </div>
         ))}
 
-        {quotations.length < max && (
+        {selected.length < max && (
           <button
             type="button"
-            onClick={() => inputRef.current?.click()}
-            aria-label="Agregar cotización"
+            onClick={onOpenPicker}
+            aria-label="Seleccionar cotización"
             className="flex h-24 w-24 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-(--primary-950) text-black cursor-pointer transition-colors hover:bg-black/5"
           >
             <Upload size={18} />
-            <span className="text-caption">Subir PDF</span>
+            <span className="text-caption">Seleccionar</span>
           </button>
         )}
       </div>
 
       {error && <p className="text-caption text-red-800">{error}</p>}
-
-      <input ref={inputRef} type="file" accept="application/pdf" multiple={max > 1} hidden onChange={handleChange} />
     </div>
   );
 }
@@ -281,7 +253,8 @@ export default function MaterialRegisterForm({
 
   const [imagePreviews, setImagePreviews] = useState([]);
   const [technicalSheetPreviews, setTechnicalSheetPreviews] = useState([]);
-  const [quotationPreviews, setQuotationPreviews] = useState([]);
+  const [selectedCotizaciones, setSelectedCotizaciones] = useState([]);
+  const [isCotizacionPickerOpen, setIsCotizacionPickerOpen] = useState(false);
 
   useEffect(() => {
     getMaterialTypes().then(setMaterialTypes);
@@ -353,15 +326,7 @@ export default function MaterialRegisterForm({
         });
         setImagePreviews(material.image_urls ?? []);
         setTechnicalSheetPreviews(material.technical_sheet_urls ?? []);
-        setQuotationPreviews(
-          Array.isArray(material.quotations)
-            ? material.quotations.map((q) => ({
-              url: q.url ?? "",
-              value: q.value !== null && q.value !== undefined ? String(q.value) : "",
-              date: q.date ?? "",
-            }))
-          : [],
-        );
+        setSelectedCotizaciones(Array.isArray(material.cotizaciones) ? material.cotizaciones : []);
       })
       .catch((err) => {
         sileo.error({
@@ -405,50 +370,16 @@ export default function MaterialRegisterForm({
 
   const MAX_QUOTATIONS = 3;
 
-  const handleAddQuotations = (files) => {
-    const remaining = MAX_QUOTATIONS - quotationPreviews.length;
-    files.slice(0, remaining).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setQuotationPreviews((current) => [...current, { url: reader.result, value: "", date: "" }].slice(0, MAX_QUOTATIONS));
-      };
-      reader.readAsDataURL(file);
-    });
+  const handleSelectCotizacion = (cotizacion) => {
+    setSelectedCotizaciones((prev) =>
+      prev.some((c) => c.id === cotizacion.id) ? prev : [...prev, cotizacion].slice(0, MAX_QUOTATIONS),
+    );
+    setIsCotizacionPickerOpen(false);
   };
 
-  const handleRemoveQuotation = (index) => {
-    setQuotationPreviews((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveCotizacion = (cotizacionId) => {
+    setSelectedCotizaciones((prev) => prev.filter((c) => c.id !== cotizacionId));
   };
-
-  const handleQuotationValueChange = (index, value) => {
-    setQuotationPreviews((prev) => prev.map((q, i) => (i === index ? { ...q, value } : q)));
-  };
-
-  const handleQuotationDateChange = (index, date) => {
-    setQuotationPreviews((prev) => prev.map((q, i) => (i === index ? { ...q, date } : q)));
-  };
-
-  // Promedio de las cotizaciones vigentes: solo las que tengan valor y fecha
-  // validos y no superen los 90 dias de antiguedad, tomando como maximo las
-  // MAX_QUOTATIONS mas recientes de ellas.
-  const quotationAverage = useMemo(() => {
-    const now = Date.now();
-    const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
-
-    const valid = quotationPreviews
-      .filter((q) => q.date && q.value !== "" && !Number.isNaN(Number(q.value)))
-      .filter((q) => {
-        const quotedAt = new Date(q.date).getTime();
-        return !Number.isNaN(quotedAt) && now - quotedAt <= NINETY_DAYS_MS;
-      })
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, MAX_QUOTATIONS);
-
-    if (valid.length === 0) return null;
-
-    const sum = valid.reduce((acc, q) => acc + Number(q.value), 0);
-    return sum / valid.length;
-  }, [quotationPreviews]);
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
@@ -490,7 +421,7 @@ export default function MaterialRegisterForm({
       ...formData,
       materialImages: imagePreviews,
       technicalSheetImages: technicalSheetPreviews,
-      quotations: quotationPreviews,
+      cotizacionIds: selectedCotizaciones.map((c) => String(c.id)),
     });
 
   const goBack = () => setCurrentStep((step) => Math.max(0, step - 1));
@@ -548,7 +479,7 @@ export default function MaterialRegisterForm({
         isActive: result.data.isActive,
         imageUrls: imagePreviews,
         technicalSheetUrls: technicalSheetPreviews,
-        quotations: quotationPreviews,
+        cotizacionIds: result.data.cotizacionIds,
         senaPlate: result.data.senaPlate,
         marca: result.data.marca,
         custodianIds: result.data.custodianIds,
@@ -773,21 +704,13 @@ export default function MaterialRegisterForm({
                     </div>
 
                     <div className="mt-6">
-                      <QuotationPicker 
-                        quotations={quotationPreviews}
-                        onAdd={handleAddQuotations}
-                        onRemove={handleRemoveQuotation}
-                        onValueChange={handleQuotationValueChange}
-                        onDateChange={handleQuotationDateChange}
+                      <QuotationPicker
+                        selected={selectedCotizaciones}
+                        onOpenPicker={() => setIsCotizacionPickerOpen(true)}
+                        onRemove={handleRemoveCotizacion}
                         max={MAX_QUOTATIONS}
-                        error={errors.quotations}
+                        error={errors.cotizacionIds}
                       />
-                      {quotationAverage !== null && (
-                        <p className="mt-2 text-sm text-black">
-                          Promedio de cotizaciones vigentes (≤90 días):{" "}
-                          <span className="font-semibold">{currencyFormatter.format(quotationAverage)}</span>
-                        </p>
-                      )}
                     </div>
                   </div>
                 )}
@@ -1014,6 +937,13 @@ export default function MaterialRegisterForm({
         isOpen={isCreateInventarioOpen}
         onClose={() => setIsCreateInventarioOpen(false)}
         onCreated={handleInventarioCreated}
+      />
+
+      <SelectCotizacionModal
+        isOpen={isCotizacionPickerOpen}
+        onClose={() => setIsCotizacionPickerOpen(false)}
+        excludeIds={selectedCotizaciones.map((c) => String(c.id))}
+        onSelect={handleSelectCotizacion}
       />
     </div>
   );

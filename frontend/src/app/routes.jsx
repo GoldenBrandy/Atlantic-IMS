@@ -9,6 +9,7 @@ import { CreateGrupoPage, ListGruposPage, EditGrupoPage } from '@/features/grupo
 import { CreateProductoPage, ListProductosPage, EditProductoPage } from '@/features/productos';
 import { CreateMarcaPage, ListMarcasPage, EditMarcaPage } from '@/features/marcas';
 import { CreateCategoriaPage, ListCategoriasPage, EditCategoriaPage } from '@/features/categorias';
+import { CreateCotizacionPage, ListCotizacionesPage, EditCotizacionPage } from '@/features/cotizaciones';
 import { CreateTareaPage, ListTareasPage, EditTareaPage, MisTareasPage } from '@/features/tareas';
 import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage, PrestamoTicketPage, ConfirmIdentityPage } from '@/features/prestamos';
 import { CreateDevolucionPage } from '@/features/devoluciones';
@@ -227,6 +228,30 @@ const router = createBrowserRouter([
                 element: (
                     <RequirePermission permission="edit_categorias">
                         <EditCategoriaPage />
+                    </RequirePermission>
+                ),
+            },
+            {
+                path: "cotizaciones",
+                element: (
+                    <RequirePermission permission="list_cotizaciones">
+                        <ListCotizacionesPage />
+                    </RequirePermission>
+                ),
+            },
+            {
+                path: "cotizaciones/crear",
+                element: (
+                    <RequirePermission permission="create_cotizaciones">
+                        <CreateCotizacionPage />
+                    </RequirePermission>
+                ),
+            },
+            {
+                path: "cotizaciones/:id/edit",
+                element: (
+                    <RequirePermission permission="edit_cotizaciones">
+                        <EditCotizacionPage />
                     </RequirePermission>
                 ),
             },

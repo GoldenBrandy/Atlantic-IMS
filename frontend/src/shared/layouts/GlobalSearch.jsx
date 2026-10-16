@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Package, ShoppingBag, Tag, Shapes, UsersRound, ClipboardList, HandCoins, Loader2 } from "lucide-react";
+import { Users, Package, ShoppingBag, Tag, Shapes, FileSpreadsheet, UsersRound, ClipboardList, HandCoins, Loader2 } from "lucide-react";
 import SearchField from "../ui/SearchField";
 import { getUsers, formatUserName } from "@/features/users/services/userService";
 import { getMateriales } from "@/features/materiales/services/materialService";
 import { getProductos } from "@/features/productos/services/productoService";
 import { getMarcas } from "@/features/marcas/services/marcaService";
 import { getCategorias } from "@/features/categorias/services/categoriaService";
+import { getCotizaciones } from "@/features/cotizaciones/services/cotizacionService";
 import { getGrupos } from "@/features/grupos/services/grupoService";
 import { getTareas } from "@/features/tareas/services/tareaService";
 import { getPrestamos } from "@/features/prestamos/services/prestamoService";
@@ -59,6 +60,15 @@ const CATEGORIES = [
     getLabel: (item) => item.name,
     getSubtitle: () => "Categoría",
     getPath: (item) => `/dashboard/categorias/${item.id}/edit`,
+  },
+  {
+    key: "cotizaciones",
+    label: "Cotizaciones",
+    icon: FileSpreadsheet,
+    fetch: getCotizaciones,
+    getLabel: (item) => item.name,
+    getSubtitle: () => "Cotización",
+    getPath: (item) => `/dashboard/cotizaciones/${item.id}/edit`,
   },
   {
     key: "grupos",
