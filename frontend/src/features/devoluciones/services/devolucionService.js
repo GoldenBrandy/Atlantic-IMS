@@ -4,13 +4,19 @@ import { API_URL as BASE_API_URL } from "@/features/config";
 const API_URL = `${BASE_API_URL}/devoluciones`;
 
 export async function getDevoluciones() {
-  const response = await fetch(API_URL);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(API_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!response.ok) throw new Error("Error obteniendo las devoluciones");
   return response.json();
 }
 
 export async function getDevolucionByPrestamoId(prestamoId) {
-  const response = await fetch(`${API_URL}/${prestamoId}`);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${API_URL}/${prestamoId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.error || "Devolución no encontrada");

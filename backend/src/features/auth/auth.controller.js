@@ -2,6 +2,13 @@ import { authService } from "./auth.service.js";
 
 export const authController = {
   async login(req, res) {
+    // Datos faltantes: solicitud invalida (400), no credenciales invalidas (401).
+    if (!req.body?.userEmail || !req.body?.userPassword) {
+      return res.status(400).json({
+        error: "Correo y contrasena son obligatorios",
+      });
+    }
+
     try {
       const result = await authService.login(req.body);
 

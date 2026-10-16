@@ -66,6 +66,26 @@ export const prestamoService = {
       error.field = "lenderIdentityConfirmed";
       throw error;
     }
+
+    // Los items deben existir y estar disponibles (activos y con existencias).
+    const ids = [...new Set(data.materialIds.map(toId).filter((id) => id !== null))];
+    const found = await prestamoRepository.findMaterialsByIds(ids);
+    if (found.length !== ids.length) {
+      const error = new Error("Uno o mas items seleccionados no existen");
+      error.statusCode = 400;
+      error.field = "materialIds";
+      throw error;
+    }
+    const unavailable = found.find((m) => !m.is_active || Number(m.quantity) <= 0);
+    if (unavailable) {
+      const error = new Error(
+        `El item "${unavailable.name}" no esta disponible (deshabilitado o sin existencias)`,
+      );
+      error.statusCode = 409;
+      error.field = "materialIds";
+      throw error;
+    }
+
     return prestamoRepository.create(mapPayload(data));
   },
 
