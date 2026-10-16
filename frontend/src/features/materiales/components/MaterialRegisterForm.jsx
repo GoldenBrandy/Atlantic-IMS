@@ -4,6 +4,7 @@ import { materialSchema } from "../schemas/materialSchema";
 import { createMaterial, updateMaterial, getMaterialById } from "../services/materialService";
 import { getMarcas } from "@/features/marcas/services/marcaService";
 import { getInventarios } from "@/features/inventarios/services/inventarioService";
+import CreateInventarioModal from "@/features/inventarios/components/CreateInventarioModal";
 import { getUsers, formatUserName } from "@/features/users/services/userService";
 import { Input, Button, Select, IconButton, MultiSelectField, StepIndicator, bigLabelClass } from "@/shared";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +22,7 @@ import {
   CalendarDays,
   DollarSign,
   X,
+  Plus,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -285,6 +287,13 @@ export default function MaterialRegisterForm({
   const [marcas, setMarcas] = useState([]);
   const [inventarios, setInventarios] = useState([]);
   const [users, setUsers] = useState([]);
+  const [isCreateInventarioOpen, setIsCreateInventarioOpen] = useState(false);
+
+  const handleInventarioCreated = (newInventario) => {
+    setInventarios((prev) => [...prev, newInventario]);
+    setFormData((prev) => ({ ...prev, inventario: String(newInventario.id) }));
+    setIsCreateInventarioOpen(false);
+  };
 
   useEffect(() => {
     if (!showExtendedFields) return;
@@ -701,16 +710,30 @@ export default function MaterialRegisterForm({
                         />
 
 
-                        <Select
-                          label="Inventario (opcional)"
-                          dense
-                          labelClassName={bigLabelClass}
-                          name="inventario"
-                          options={inventarioOptions}
-                          value={formData.inventario}
-                          onChange={handleChange}
-                          error={errors.inventario}
-                        />
+                        <div className="flex items-end gap-2">
+                          <div className="flex-1">
+                            <Select
+                              label="Inventario (opcional)"
+                              dense
+                              labelClassName={bigLabelClass}
+                              name="inventario"
+                              options={inventarioOptions}
+                              value={formData.inventario}
+                              onChange={handleChange}
+                              error={errors.inventario}
+                            />
+                          </div>
+                          <IconButton
+                            type="button"
+                            ariaLabel="Crear inventario"
+                            variant="default"
+                            hitSize={40}
+                            iconSize={18}
+                            onClick={() => setIsCreateInventarioOpen(true)}
+                          >
+                            <Plus size={18} />
+                          </IconButton>
+                        </div>
 
                         <MultiSelectField
                           label="Cuentadante(s)"
@@ -955,6 +978,12 @@ export default function MaterialRegisterForm({
           </form>
         </div>
       </div>
+
+      <CreateInventarioModal
+        isOpen={isCreateInventarioOpen}
+        onClose={() => setIsCreateInventarioOpen(false)}
+        onCreated={handleInventarioCreated}
+      />
     </div>
   );
 }
