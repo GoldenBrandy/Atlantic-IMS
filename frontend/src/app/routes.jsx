@@ -8,6 +8,7 @@ import { ListMaterialPage, CreateMaterialPage, EditMaterialPage } from '@/featur
 import { CreateGrupoPage, ListGruposPage, EditGrupoPage } from '@/features/grupos';
 import { CreateProductoPage, ListProductosPage, EditProductoPage } from '@/features/productos';
 import { CreateMarcaPage, ListMarcasPage, EditMarcaPage } from '@/features/marcas';
+import { CreateCategoriaPage, ListCategoriasPage, EditCategoriaPage } from '@/features/categorias';
 import { CreateTareaPage, ListTareasPage, EditTareaPage, MisTareasPage } from '@/features/tareas';
 import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage, PrestamoTicketPage, ConfirmIdentityPage } from '@/features/prestamos';
 import { CreateDevolucionPage } from '@/features/devoluciones';
@@ -202,6 +203,30 @@ const router = createBrowserRouter([
                 element: (
                     <RequirePermission permission="edit_marcas">
                         <EditMarcaPage />
+                    </RequirePermission>
+                ),
+            },
+            {
+                path: "categorias",
+                element: (
+                    <RequirePermission permission="list_categorias">
+                        <ListCategoriasPage />
+                    </RequirePermission>
+                ),
+            },
+            {
+                path: "categorias/crear",
+                element: (
+                    <RequirePermission permission="create_categorias">
+                        <CreateCategoriaPage />
+                    </RequirePermission>
+                ),
+            },
+            {
+                path: "categorias/:id/edit",
+                element: (
+                    <RequirePermission permission="edit_categorias">
+                        <EditCategoriaPage />
                     </RequirePermission>
                 ),
             },

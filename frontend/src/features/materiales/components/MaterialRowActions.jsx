@@ -9,7 +9,6 @@ import {
   ViewDetailsModal,
   IconButton,
 } from "@/shared";
-import { MATERIAL_CATEGORY_OPTIONS } from "../services/materialTypeService";
 import { formatUserName } from "@/features/users/services/userService";
 
 const currencyFormatter = new Intl.NumberFormat("es-CO", {
@@ -17,11 +16,6 @@ const currencyFormatter = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 2,
 });
-
-function findCategoryLabel(id) {
-  if (!id) return null;
-  return MATERIAL_CATEGORY_OPTIONS.find((option) => option.id === id)?.label ?? id;
-}
 
 // Traduce ids de cuentadantes a nombres, usando la lista de usuarios ya cargada.
 function findCustodianNames(custodianIds, users) {
@@ -140,7 +134,7 @@ export default function MaterialRowActions({ material, users = [] }) {
           ...(isDevolutivo
             ? [
                 { label: "Modelo", value: material.model },
-                { label: "Categoría", value: findCategoryLabel(material.category) },
+                { label: "Categoría", value: material.categoria_name },
                 { label: "ID", value: material.external_id },
               ]
             : []),

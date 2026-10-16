@@ -3,9 +3,10 @@ import { pool } from "../../config/db.js";
 const SELECT_FIELDS = `
   m.id, m.name, m.type, m.quantity, m.description, m.is_active, m.image_urls,
   m.technical_sheet_urls, m.quotations, m.sena_plate, m.location, m.purchase_date, m.unit_value, m.total_value,
-  m.model, m.category, m.external_id,
+  m.model, m.external_id,
   m.marca_id, ma.name AS marca_name,
-  m.inventario_id, inv.name AS inventario_name
+  m.inventario_id, inv.name AS inventario_name,
+  m.categoria_id, cat.name AS categoria_name
 `;
 
 // Agrega los ids de los cuentadantes (puede haber varios) consultando la tabla puente.
@@ -25,6 +26,7 @@ export const materialRepository = {
       FROM materiales m
       LEFT JOIN marcas ma ON ma.id = m.marca_id
       LEFT JOIN inventarios inv ON inv.id = m.inventario_id
+      LEFT JOIN categorias cat ON cat.id = m.categoria_id
       ORDER BY m.id;
     `);
     return Promise.all(result.rows.map(attachCustodians));
@@ -36,6 +38,7 @@ export const materialRepository = {
        FROM materiales m
        LEFT JOIN marcas ma ON ma.id = m.marca_id
        LEFT JOIN inventarios inv ON inv.id = m.inventario_id
+       LEFT JOIN categorias cat ON cat.id = m.categoria_id
        WHERE m.id = $1;`,
       [id],
     );
@@ -47,7 +50,7 @@ export const materialRepository = {
       name, type, quantity, description, isActive, imageUrls,
       technicalSheetUrls, quotations, senaPlate, marcaId, custodianIds, inventarioId,
       location, purchaseDate, unitValue, totalValue,
-      model, category, externalId,
+      model, categoriaId, externalId,
     } = data;
 
     const client = await pool.connect();
@@ -59,7 +62,7 @@ export const materialRepository = {
            name, type, quantity, description, is_active, image_urls,
            technical_sheet_urls, quotations, sena_plate, marca_id, inventario_id,
            location, purchase_date, unit_value, total_value,
-           model, category, external_id
+           model, categoria_id, external_id
          )
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
          RETURNING id;`,
@@ -68,7 +71,7 @@ export const materialRepository = {
           technicalSheetUrls?.length ? technicalSheetUrls : null, quotations?.length ? JSON.stringify(quotations) : null,
           senaPlate || null, marcaId || null, inventarioId || null,
           location || null, purchaseDate || null, unitValue ?? null, totalValue ?? null,
-          model || null, category || null, externalId || null,
+          model || null, categoriaId || null, externalId || null,
         ],
       );
       const materialId = insertResult.rows[0].id;
@@ -98,7 +101,7 @@ export const materialRepository = {
       name, type, quantity, description, imageUrls,
       technicalSheetUrls, quotations, senaPlate, marcaId, custodianIds, inventarioId,
       location, purchaseDate, unitValue, totalValue,
-      model, category, externalId,
+      model, categoriaId, externalId,
     } = data;
 
     const client = await pool.connect();
@@ -110,7 +113,7 @@ export const materialRepository = {
            name = $1, type = $2, quantity = $3, description = $4, image_urls = $5,
            technical_sheet_urls = $6, quotations = $7, sena_plate = $8, marca_id = $9, inventario_id = $10,
            location = $11, purchase_date = $12, unit_value = $13, total_value = $14,
-           model = $15, category = $16, external_id = $17
+           model = $15, categoria_id = $16, external_id = $17
          WHERE id = $18
          RETURNING id;`,
         [
@@ -118,7 +121,7 @@ export const materialRepository = {
           technicalSheetUrls?.length ? technicalSheetUrls : null, quotations?.length ? JSON.stringify(quotations) : null,
           senaPlate || null, marcaId || null, inventarioId || null,
           location || null, purchaseDate || null, unitValue ?? null, totalValue ?? null,
-          model || null, category || null, externalId || null,
+          model || null, categoriaId || null, externalId || null,
           id,
         ],
       );

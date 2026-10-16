@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { getMaterialTypes, MATERIAL_CATEGORY_OPTIONS } from "../services/materialTypeService";
+import { getMaterialTypes } from "../services/materialTypeService";
+import { getCategorias } from "@/features/categorias/services/categoriaService";
 import { materialSchema } from "../schemas/materialSchema";
 import { createMaterial, updateMaterial, getMaterialById } from "../services/materialService";
 import { getMarcas } from "@/features/marcas/services/marcaService";
@@ -286,6 +287,7 @@ export default function MaterialRegisterForm({
 
   const [marcas, setMarcas] = useState([]);
   const [inventarios, setInventarios] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [users, setUsers] = useState([]);
   const [isCreateInventarioOpen, setIsCreateInventarioOpen] = useState(false);
 
@@ -299,6 +301,7 @@ export default function MaterialRegisterForm({
     if (!showExtendedFields) return;
     getMarcas().then(setMarcas).catch(console.error);
     getInventarios().then(setInventarios).catch(console.error);
+    getCategorias().then(setCategorias).catch(console.error);
     getUsers().then(setUsers).catch(console.error);
   }, [showExtendedFields]);
 
@@ -319,8 +322,8 @@ export default function MaterialRegisterForm({
   );
 
   const categoryOptions = useMemo(
-    () => [{ id: "", label: "Selecciona una categoría" }, ...MATERIAL_CATEGORY_OPTIONS],
-    [],
+    () => [{ id: "", label: "Selecciona una categoría" }, ...categorias.map((cat) => ({ id: String(cat.id), label: cat.name }))],
+    [categorias],
   );
 
   // Precarga los datos del material desde la API cuando se esta editando.
@@ -342,7 +345,7 @@ export default function MaterialRegisterForm({
           purchaseDate: material.purchase_date ? String(material.purchase_date).slice(0, 10) : "",
           unitValue: material.unit_value ?? "",
           model: material.model ?? "",
-          category: material.category ?? "",
+          category: material.categoria_id ? String(material.categoria_id) : "",
           externalId: material.external_id ?? "",
         });
         setImagePreviews(material.image_urls ?? []);

@@ -5,7 +5,7 @@ export const MATERIAL_REPORT_FIELDS = [
   { key: "marca_name", label: "Marca", default: true },
   { key: "inventario_name", label: "Inventario", default: true },
   { key: "model", label: "Modelo", default: false },
-  { key: "category", label: "Categoría", default: false },
+  { key: "categoria_name", label: "Categoría", default: false },
   { key: "sena_plate", label: "Placa SENA", default: false },
   { key: "external_id", label: "ID", default: false },
   { key: "location", label: "Ubicación", default: false },

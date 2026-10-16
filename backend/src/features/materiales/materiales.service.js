@@ -51,7 +51,7 @@ function mapPayload(data) {
     unitValue,
     totalValue,
     model: data.model ?? null,
-    category: data.category ?? null,
+    categoriaId: toId(data.categoriaId ?? data.category),
     externalId: data.externalId ?? null,
   };
 }

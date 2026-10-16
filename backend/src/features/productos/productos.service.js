@@ -14,11 +14,17 @@ async function generateProductCode() {
   return nextProductCode(existingCodes);
 }
 
+function toCategoriaId(value) {
+  if (value === undefined || value === null || value === "") return null;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
 function mapPayload(data) {
   return {
     name: data.name,
     type: data.type,
-    category: data.category,
+    categoriaId: toCategoriaId(data.categoriaId ?? data.category),
     responsible: toResponsibleId(data.responsible),
     lastMovement: data.lastMovement,
     location: data.location,

@@ -1,9 +1,6 @@
 import { Switch } from "@/shared";
 import { formatUserName } from "@/features/users/services/userService";
-import {
-  PRODUCT_TYPE_OPTIONS,
-  CATEGORY_OPTIONS,
-} from "../services/productoOptionsService";
+import { PRODUCT_TYPE_OPTIONS } from "../services/productoOptionsService";
 import ProductoRowActions from "../components/ProductoRowActions";
 
 // Traduce un id de opcion (tipo, categoria) a su etiqueta visible.
@@ -39,7 +36,7 @@ export function getProductoColumns(users = [], onToggleStatus) {
     {
       id: "category",
       header: "Categoria",
-      cell: ({ row }) => findLabel(CATEGORY_OPTIONS, row.original.category),
+      cell: ({ row }) => row.original.categoria_name ?? "-",
     },
     {
       id: "responsible",
