@@ -57,13 +57,6 @@ export const materialSchema = z
         message: "La descripción es obligatoria",
       });
     }
-    if (!data.marca) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["marca"],
-        message: "Debe seleccionar una marca",
-      });
-    }
     if (!data.purchaseDate) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -143,13 +136,6 @@ export const materialSchema = z
     }
 
     if (isDevolutivo) {
-      if (!data.model) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["model"],
-          message: "El modelo es obligatorio",
-        });
-      }
       if (!data.category) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

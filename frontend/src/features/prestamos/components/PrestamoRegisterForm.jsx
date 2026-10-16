@@ -442,10 +442,13 @@ export default function PrestamoRegisterForm({
             {currentStep === 3 && (
               <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
                 <h2 className="mb-4 text-base font-semibold">Legalización</h2>
+                <p className="mb-4 text-caption text-black/60">
+                  Opcional: si la persona no puede firmar ahora, puede hacerlo más tarde editando este préstamo desde su propia cuenta.
+                </p>
 
                 <div className="flex flex-col gap-2">
                   <p className="text-sm font-semibold text-black">
-                    Firma digital<span className="text-red-600!"> *</span>
+                    Firma digital (opcional)
                   </p>
 
                   <button

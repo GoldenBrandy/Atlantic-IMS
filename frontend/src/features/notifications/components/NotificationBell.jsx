@@ -3,12 +3,21 @@
 // asignado cuando su tarea fue verificada. Se refresca por polling simple
 // (sin websockets) cada 30 segundos.
 import { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Bell, ClipboardList, HandCoins } from "lucide-react";
 import { Dropdown, DropdownTrigger, DropdownContent, IconButton } from "@/shared";
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "../services/notificationService";
-import { getToken } from "@/features/auth";
+import { getToken, getCurrentUser, isSuperUser } from "@/features/auth";
+import { getTareas } from "@/features/tareas/services/tareaService";
+import { getPrestamos } from "@/features/prestamos/services/prestamoService";
+import { TASK_STATUS_OPTIONS } from "@/features/tareas/services/tareaOptionsService";
+import { getPrestamoStatus, PRESTAMO_STATUS_STYLES } from "@/features/prestamos/services/prestamoStatus";
 
 const POLL_INTERVAL_MS = 30000;
+
+function findLabel(options, id) {
+  return options.find((option) => option.id === id)?.label ?? id;
+}
 
 function timeAgo(dateString) {
   const diffMs = Date.now() - new Date(dateString).getTime();
@@ -21,11 +30,36 @@ function timeAgo(dateString) {
 }
 
 export default function NotificationBell() {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
+  // Resumen segun el rol: a un usuario estandar se le muestran sus propias
+  // tareas asignadas; a un super administrador, los ultimos 5 prestamos.
+  const [myTareas, setMyTareas] = useState([]);
+  const [recentPrestamos, setRecentPrestamos] = useState([]);
+  const isAdmin = isSuperUser();
+  const currentUserId = getCurrentUser()?.id;
 
   const load = () => {
     if (!getToken()) return;
     getNotifications().then(setNotifications).catch(console.error);
+
+    if (isAdmin) {
+      getPrestamos()
+        .then((data) => {
+          const sorted = [...(Array.isArray(data) ? data : [])].sort((a, b) => b.id - a.id);
+          setRecentPrestamos(sorted.slice(0, 5));
+        })
+        .catch(console.error);
+    } else {
+      getTareas()
+        .then((data) => {
+          const mine = (Array.isArray(data) ? data : []).filter((tarea) =>
+            (tarea.assigned_users ?? []).some((id) => String(id) === String(currentUserId)),
+          );
+          setMyTareas(mine);
+        })
+        .catch(console.error);
+    }
   };
 
   useEffect(() => {
@@ -69,6 +103,66 @@ export default function NotificationBell() {
       </DropdownTrigger>
 
       <DropdownContent className="w-96 max-w-[90vw] p-0">
+        <div className="border-b border-neutral-100 px-4 py-3">
+          <p className="mb-2 text-sm font-semibold">
+            {isAdmin ? "Últimos préstamos" : "Mis tareas asignadas"}
+          </p>
+
+          {isAdmin ? (
+            recentPrestamos.length === 0 ? (
+              <p className="text-caption text-neutral-500">No hay préstamos registrados</p>
+            ) : (
+              <div className="flex flex-col gap-1">
+                {recentPrestamos.map((prestamo) => {
+                  const status = getPrestamoStatus(prestamo);
+                  return (
+                    <button
+                      key={prestamo.id}
+                      type="button"
+                      onClick={() => navigate(`/dashboard/prestamos/${prestamo.id}/ticket`)}
+                      className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left text-caption transition-colors hover:bg-neutral-50"
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        <HandCoins size={14} className="shrink-0 text-neutral-400" />
+                        <span className="truncate">Préstamo #{prestamo.id}</span>
+                      </span>
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${PRESTAMO_STATUS_STYLES[status.id]}`}>
+                        {status.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          ) : myTareas.length === 0 ? (
+            <p className="text-caption text-neutral-500">No tienes tareas asignadas</p>
+          ) : (
+            <div className="flex flex-col gap-1">
+              {myTareas.slice(0, 5).map((tarea) => (
+                <button
+                  key={tarea.id}
+                  type="button"
+                  onClick={() => navigate("/dashboard/mis-tareas")}
+                  className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left text-caption transition-colors hover:bg-neutral-50"
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <ClipboardList size={14} className="shrink-0 text-neutral-400" />
+                    <span className="truncate">{tarea.task_name}</span>
+                  </span>
+                  <span className="shrink-0 text-neutral-400">{findLabel(TASK_STATUS_OPTIONS, tarea.status)}</span>
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard/mis-tareas")}
+                className="px-2 pt-1 text-left text-caption text-(--primary-950) underline"
+              >
+                Ver todas mis tareas
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
           <p className="text-sm font-semibold">Notificaciones</p>
           {unreadCount > 0 && (

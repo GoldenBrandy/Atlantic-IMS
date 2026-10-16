@@ -36,12 +36,9 @@ export const prestamoService = {
   },
 
   async createPrestamo(data) {
-    if (!data.signatureUrl) {
-      const error = new Error("Debe adjuntar la firma digital para legalizar el préstamo");
-      error.statusCode = 400;
-      error.field = "signatureUrl";
-      throw error;
-    }
+    // La firma ya no es obligatoria al crear: la persona puede firmar despues
+    // editando el prestamo desde su propia cuenta, sin tener que estar
+    // presente en el momento de la creacion.
     if (!Array.isArray(data.materialIds) || data.materialIds.length === 0) {
       const error = new Error("Debe seleccionar al menos un ítem a prestar");
       error.statusCode = 400;

@@ -639,8 +639,7 @@ export default function MaterialRegisterForm({
 
                         {isDevolutivo && (
                           <Input
-                            label="Modelo"
-                            required
+                            label="Modelo (opcional)"
                             dense
                             labelClassName={bigLabelClass}
                             name="model"
@@ -678,23 +677,20 @@ export default function MaterialRegisterForm({
                           />
                         )}
 
-                        {isDevolutivo && (
-                          <Input
-                            label="Serial SN (opcional)"
-                            dense
-                            labelClassName={bigLabelClass}
-                            name="externalId"
-                            placeholder="Identificador interno"
-                            startAdornment={<Hash size={16} />}
-                            value={formData.externalId}
-                            onChange={handleChange}
-                            error={errors.externalId}
-                          />
-                        )}
+                        <Input
+                          label="Serial SN (opcional)"
+                          dense
+                          labelClassName={bigLabelClass}
+                          name="externalId"
+                          placeholder="Identificador interno"
+                          startAdornment={<Hash size={16} />}
+                          value={formData.externalId}
+                          onChange={handleChange}
+                          error={errors.externalId}
+                        />
 
                         <Select
-                          label="Marca"
-                          required
+                          label="Marca (opcional)"
                           dense
                           labelClassName={bigLabelClass}
                           name="marca"
