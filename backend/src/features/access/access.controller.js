@@ -11,5 +11,16 @@ export const accessController = {
             permission: 'list_users',
             granted: hasPermission
         });
+    },
+
+    // Usado por el frontend para saber, antes de mostrar una pantalla, si el
+    // usuario autenticado tiene el permiso indicado (super admin siempre lo tiene).
+    async checkPermission(req, res) {
+        const userId = req.user.id;
+        const { code } = req.params;
+
+        const granted = await accessService.hasPermission(userId, code);
+
+        res.json({ granted });
     }
 };
