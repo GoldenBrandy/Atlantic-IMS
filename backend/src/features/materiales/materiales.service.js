@@ -48,6 +48,7 @@ function mapPayload(data) {
     inventarioId: toId(data.inventarioId ?? data.inventario),
     location: data.location ?? null,
     purchaseDate: data.purchaseDate || null,
+    entryDate: data.entryDate || null,
     unitValue,
     totalValue,
     model: data.model ?? null,

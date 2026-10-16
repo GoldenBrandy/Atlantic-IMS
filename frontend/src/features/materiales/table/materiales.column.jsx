@@ -90,6 +90,11 @@ export function getMaterialColumns(onToggleStatus, users = []) {
       cell: ({ row }) => muted(row.original.purchase_date ? String(row.original.purchase_date).slice(0, 10) : null),
     },
     {
+      id: "entry_date",
+      header: "Fecha ingreso",
+      cell: ({ row }) => muted(row.original.entry_date ? String(row.original.entry_date).slice(0, 10) : null),
+    },
+    {
       id: "unit_value",
       header: "Valor unitario",
       cell: ({ row }) => muted(row.original.unit_value ? currencyFormatter.format(row.original.unit_value) : null),

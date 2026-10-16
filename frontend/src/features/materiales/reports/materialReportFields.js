@@ -15,6 +15,12 @@ export const MATERIAL_REPORT_FIELDS = [
     default: false,
     value: (m) => (m.purchase_date ? String(m.purchase_date).slice(0, 10) : ""),
   },
+  {
+    key: "entry_date",
+    label: "Fecha ingreso",
+    default: false,
+    value: (m) => (m.entry_date ? String(m.entry_date).slice(0, 10) : ""),
+  },
   { key: "unit_value", label: "Valor unitario", default: false },
   { key: "total_value", label: "Valor Total", default: false },
   { key: "description", label: "Descripción", default: false },

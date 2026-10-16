@@ -126,6 +126,7 @@ export default function MaterialRowActions({ material, users = [] }) {
                 { label: "Inventario", value: material.inventario_name },
                 { label: "Ubicación", value: material.location },
                 { label: "Fecha compra", value: material.purchase_date ? String(material.purchase_date).slice(0, 10) : null },
+                { label: "Fecha ingreso", value: material.entry_date ? String(material.entry_date).slice(0, 10) : null },
                 { label: "Valor unitario", value: material.unit_value ? currencyFormatter.format(material.unit_value) : null },
                 { label: "Valor Total", value: material.total_value ? currencyFormatter.format(material.total_value) : null },
               ]

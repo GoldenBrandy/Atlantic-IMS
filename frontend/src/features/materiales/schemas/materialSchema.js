@@ -40,6 +40,7 @@ export const materialSchema = z
     inventario: z.string().optional(),
     location: z.string().max(150, "La ubicación es demasiado larga").optional(),
     purchaseDate: z.string().optional(),
+    entryDate: z.string().optional(),
     unitValue: z.union([z.string(), z.number()]).optional(),
     model: z.string().max(100, "El modelo es demasiado largo").optional(),
     category: z.string().optional(),

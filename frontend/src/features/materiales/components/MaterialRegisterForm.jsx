@@ -21,6 +21,7 @@ import {
   UserCog,
   MapPin,
   CalendarDays,
+  CalendarPlus,
   DollarSign,
   X,
   Plus,
@@ -260,6 +261,7 @@ export default function MaterialRegisterForm({
     inventario: "",
     location: "",
     purchaseDate: "",
+    entryDate: "",
     unitValue: "",
     model: "",
     category: "",
@@ -343,6 +345,7 @@ export default function MaterialRegisterForm({
           inventario: material.inventario_id ? String(material.inventario_id) : "",
           location: material.location ?? "",
           purchaseDate: material.purchase_date ? String(material.purchase_date).slice(0, 10) : "",
+          entryDate: material.entry_date ? String(material.entry_date).slice(0, 10) : "",
           unitValue: material.unit_value ?? "",
           model: material.model ?? "",
           category: material.categoria_id ? String(material.categoria_id) : "",
@@ -552,6 +555,7 @@ export default function MaterialRegisterForm({
         inventario: result.data.inventario,
         location: result.data.location,
         purchaseDate: result.data.purchaseDate,
+        entryDate: result.data.entryDate,
         unitValue: result.data.unitValue,
         model: result.data.model,
         category: result.data.category,
@@ -833,6 +837,18 @@ export default function MaterialRegisterForm({
                         onChange={handleChange}
                         error={errors.purchaseDate}
                       />
+
+                      <Input
+                        label="Fecha de ingreso (opcional)"
+                        dense
+                        labelClassName={bigLabelClass}
+                        name="entryDate"
+                        type="date"
+                        startAdornment={<CalendarPlus size={16} />}
+                        value={formData.entryDate}
+                        onChange={handleChange}
+                        error={errors.entryDate}
+                      />
                     </div>
                   </div>
                 )}
@@ -947,6 +963,18 @@ export default function MaterialRegisterForm({
                         value={formData.materialDescription}
                         onChange={handleChange}
                         error={errors.materialDescription}
+                      />
+
+                      <Input
+                        label="Fecha de ingreso (opcional)"
+                        dense
+                        labelClassName={bigLabelClass}
+                        name="entryDate"
+                        type="date"
+                        startAdornment={<CalendarPlus size={16} />}
+                        value={formData.entryDate}
+                        onChange={handleChange}
+                        error={errors.entryDate}
                       />
                     </div>
                   </div>
