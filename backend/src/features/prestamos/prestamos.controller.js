@@ -59,4 +59,25 @@ export const prestamoController = {
       res.status(400).json({ error: err.message });
     }
   },
+
+  // Publicos (sin sesion): la persona llega desde el link del correo.
+  async confirmIdentity(req, res) {
+    try {
+      const result = await prestamoService.confirmIdentity(req.params.id, req.body.role, req.body.code);
+      res.status(200).json({ message: "Identidad confirmada correctamente", ...result });
+    } catch (err) {
+      console.error("ERROR BACKEND:", err);
+      res.status(err.statusCode ?? 500).json({ error: err.message, field: err.field });
+    }
+  },
+
+  async resendIdentityCode(req, res) {
+    try {
+      await prestamoService.resendIdentityCode(req.params.id, req.body.role);
+      res.status(200).json({ message: "Código reenviado correctamente" });
+    } catch (err) {
+      console.error("ERROR BACKEND:", err);
+      res.status(err.statusCode ?? 500).json({ error: err.message, field: err.field });
+    }
+  },
 };

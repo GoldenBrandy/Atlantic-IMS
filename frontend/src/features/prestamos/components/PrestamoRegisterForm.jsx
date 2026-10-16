@@ -20,7 +20,6 @@ import {
   Upload,
   FileSignature,
   ShieldCheck,
-  BadgeCheck,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -31,7 +30,7 @@ import { sileo } from "sileo";
 // paso ACTUAL tiene errores (los de pasos futuros se validan al llegar).
 const STEP_FIELDS = [
   ["materialIds", "loanType", "ficha"],
-  ["requestingUser", "requesterEmail", "lendingUser", "startDate", "dueDate", "requesterIdentityConfirmed", "lenderIdentityConfirmed"],
+  ["requestingUser", "requesterEmail", "lendingUser", "startDate", "dueDate"],
   ["justification"],
   ["signatureUrl"],
 ];
@@ -92,15 +91,7 @@ export default function PrestamoRegisterForm({
     loanType: "",
     startDate: "",
     dueDate: "",
-    requesterIdentityConfirmed: false,
-    lenderIdentityConfirmed: false,
   });
-
-  const toggleRequesterIdentityConfirmed = () => 
-    setFormData((prev) => ({ ...prev, requesterIdentityConfirmed: !prev.requesterIdentityConfirmed }));
-
-  const toggleLenderIdentityConfirmed = () => 
-    setFormData((prev) => ({...prev, lenderIdentityConfirmed: !prev.lenderIdentityConfirmed }));
 
   const [signaturePreview, setSignaturePreview] = useState(null);
   const [signatureFileName, setSignatureFileName] = useState("");
@@ -120,8 +111,6 @@ export default function PrestamoRegisterForm({
           loanType: prestamo.loan_type ?? "",
           startDate: prestamo.start_date ? String(prestamo.start_date).slice(0, 10) : "",
           dueDate: prestamo.due_date ? String(prestamo.due_date).slice(0, 10) : "",
-          requesterIdentityConfirmed: Boolean(prestamo.requester_identity_confirmed),
-          lenderIdentityConfirmed: Boolean(prestamo.lender_identity_confirmed),
         });
         setSignaturePreview(prestamo.signature_url ?? null);
       })
@@ -219,7 +208,7 @@ export default function PrestamoRegisterForm({
         const res = await createPrestamo(result.data);
         sileo.success({
           title: "Préstamo creado",
-          description: res?.message ?? "Préstamo creado correctamente",
+          description: "Queda pendiente de confirmación: se envió un código de identidad a los correos registrados.",
         });
         navigate(`/dashboard/prestamos/${res.prestamoId}/ticket`, { replace: true });
       }
@@ -341,19 +330,11 @@ export default function PrestamoRegisterForm({
                         />
                       )}
 
-                      <Button
-                        type="button"
-                        variant={formData.requesterIdentityConfirmed ? "primary" : "secondary"}
-                        size="sm"
-                        className="w-fit gap-2"
-                        onClick={toggleRequesterIdentityConfirmed}
-                      >
-                        {formData.requesterIdentityConfirmed ? <BadgeCheck size={16} /> : <ShieldCheck size={16} />}
-                        {formData.requesterIdentityConfirmed ? "Identidad confirmada" : "Confirmar identidad"}
-                      </Button>
-                      {errors.requesterIdentityConfirmed && (
-                        <p className="text-caption text-red-800">{errors.requesterIdentityConfirmed}</p>
-                      )}
+                      <p className="flex items-start gap-2 text-caption text-neutral-500">
+                        <ShieldCheck size={14} className="mt-0.5 shrink-0" />
+                        Al guardar, se enviará un código de confirmación de identidad a este correo. El
+                        préstamo queda pendiente hasta que lo confirmen desde su celular.
+                      </p>
                     </div>
 
                     <div className="flex flex-col gap-2">
@@ -369,18 +350,12 @@ export default function PrestamoRegisterForm({
                         error={errors.lendingUser}
                       />
 
-                      <Button
-                        type="button"
-                        variant={formData.lenderIdentityConfirmed ? "primary" : "secondary"}
-                        size="sm"
-                        className="w-fit gap-2"
-                        onClick={toggleLenderIdentityConfirmed}
-                      >
-                        {formData.lenderIdentityConfirmed ? <BadgeCheck size={16} /> : <ShieldCheck size={16} />}
-                        {formData.lenderIdentityConfirmed ? "Identidad confirmada" : "Confirmar identidad"}
-                      </Button>
-                      {errors.lenderIdentityConfirmed && (
-                        <p className="text-caption text-red-800">{errors.lenderIdentityConfirmed}</p>
+                      {formData.lendingUser && (
+                        <p className="flex items-start gap-2 text-caption text-neutral-500">
+                          <ShieldCheck size={14} className="mt-0.5 shrink-0" />
+                          Al guardar, se enviará un código de confirmación de identidad al correo de este
+                          usuario. El préstamo queda pendiente hasta que lo confirme desde su celular.
+                        </p>
                       )}
                     </div>
                   </div>

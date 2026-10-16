@@ -8,6 +8,7 @@ const SMTP_PORT = process.env.SMTP_PORT;
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASSWORD = process.env.SMTP_PASSWORD;
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const isConfigured = Boolean(SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD);
 
@@ -67,6 +68,23 @@ export async function sendAccessRequestEmail({ to, fullName, email, reason }) {
       `Nombre: ${fullName}\n` +
       `Correo: ${email}\n` +
       `Motivo: ${reason || "No especificado"}`,
+  });
+}
+
+// Codigo para confirmar identidad al quedar como solicitante o prestador de
+// un prestamo (en vez de un boton que cualquiera podia pulsar). Se manda al
+// crear el prestamo; la persona lo confirma desde su propio celular.
+export async function sendIdentityConfirmationCodeEmail({ to, name, code, prestamoId, role }) {
+  const roleLabel = role === "lender" ? "prestador" : "solicitante";
+  const link = `${FRONTEND_URL}/auth/confirmar-identidad/${prestamoId}?role=${role}`;
+  return sendEmail({
+    to,
+    subject: "Confirma tu identidad para el préstamo",
+    text:
+      `Hola ${name || ""}, quedaste registrado como ${roleLabel} de un préstamo y necesitamos confirmar tu identidad.\n\n` +
+      `Tu código de confirmación de 8 dígitos es: ${code}\n` +
+      `Este código vence en 60 minutos.\n\n` +
+      `Ingresa desde tu celular a ${link} y escribe el código.`,
   });
 }
 

@@ -5,6 +5,10 @@ export function getPrestamoStatus(prestamo) {
     return { id: "devuelto", label: "Devuelto" };
   }
 
+  if (!prestamo.requester_identity_confirmed || !prestamo.lender_identity_confirmed) {
+    return { id: "pendiente_confirmacion", label: "Pendiente de confirmación" };
+  }
+
   if (prestamo.due_date) {
     const due = new Date(prestamo.due_date);
     due.setHours(0, 0, 0, 0);
@@ -23,4 +27,5 @@ export const PRESTAMO_STATUS_STYLES = {
   vigente: "bg-blue-100 text-blue-700",
   vencido: "bg-red-100 text-red-700",
   devuelto: "bg-green-100 text-green-700",
+  pendiente_confirmacion: "bg-amber-100 text-amber-700",
 };

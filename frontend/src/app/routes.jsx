@@ -9,7 +9,7 @@ import { CreateGrupoPage, ListGruposPage, EditGrupoPage } from '@/features/grupo
 import { CreateProductoPage, ListProductosPage, EditProductoPage } from '@/features/productos';
 import { CreateMarcaPage, ListMarcasPage, EditMarcaPage } from '@/features/marcas';
 import { CreateTareaPage, ListTareasPage, EditTareaPage, MisTareasPage } from '@/features/tareas';
-import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage, PrestamoTicketPage } from '@/features/prestamos';
+import { CreatePrestamoPage, ListPrestamosPage, EditPrestamoPage, PrestamoTicketPage, ConfirmIdentityPage } from '@/features/prestamos';
 import { CreateDevolucionPage } from '@/features/devoluciones';
 import { ListInventariosPage, CreateInventarioPage, EditInventarioPage } from '@/features/inventarios';
 import { ListReportesPage } from '@/features/reportes';
@@ -31,6 +31,7 @@ const router = createBrowserRouter([
             {index: true, element: <LoginRoute />},
             {path: "forgot-password", element: <ForgotPassword />},
             {path: "solicitar-registro", element: <RequestAccess />},
+            {path: "confirmar-identidad/:prestamoId", element: <ConfirmIdentityPage />},
         ],
     },
     {
