@@ -45,7 +45,7 @@ function CodeInput({ value, onChange, error }) {
 
   return (
     <div>
-      <div className="flex justify-center gap-2" onPaste={handlePaste}>
+      <div className="grid grid-cols-8 gap-1 sm:gap-2" onPaste={handlePaste}>
         {Array.from({ length: CODE_LENGTH }).map((_, index) => (
           <input
             key={index}
@@ -56,7 +56,7 @@ function CodeInput({ value, onChange, error }) {
             value={value[index] ?? ""}
             onChange={(e) => handleChange(index, e)}
             onKeyDown={(e) => handleKeyDown(index, e)}
-            className={`h-12 w-10 rounded-md border text-center text-lg focus:outline-none ${
+            className={`h-11 w-full rounded-md border text-center text-lg text-black focus:outline-none sm:h-12 ${
               error ? "border-red-800" : "border-border focus:border-[3px] focus:border-(--primary-950)"
             }`}
           />
@@ -126,7 +126,7 @@ export default function ConfirmIdentityPage() {
   if (result) {
     return (
       <section className="w-full max-w-md text-center text-black [&_h1]:text-black">
-        <div className="mx-auto grid w-full max-w-md gap-4 rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
+        <div className="mx-auto grid w-full max-w-md gap-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-6">
           <CheckCircle2 size={40} className="mx-auto text-green-600" />
           <h1 className="text-2xl">Identidad confirmada</h1>
           <p className="text-medium text-black/70">
@@ -144,7 +144,7 @@ export default function ConfirmIdentityPage() {
 
   return (
     <section className="w-full max-w-md text-black [&_h1]:text-black [&_input]:text-black">
-      <div className="mx-auto grid w-full max-w-md gap-6 rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
+      <div className="mx-auto grid w-full max-w-md gap-6 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-6">
         <form className="grid gap-6" onSubmit={handleSubmit} noValidate>
           <div>
             <ShieldCheck size={32} className="mx-auto mb-2 text-(--primary-950)" />
