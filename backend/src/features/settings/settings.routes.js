@@ -4,8 +4,9 @@ import { authenticateToken, requireSuperUser } from "../../middlewares/auth.midd
 
 const router = Router();
 
-// Cualquier usuario logueado puede ver el correo de soporte (se muestra en "Ver perfil").
-router.get("/support-email", authenticateToken, settingsController.getSupportEmail);
+// Publico a proposito: se muestra en "Ver perfil" (ya logueado) y tambien en
+// el login/pantallas de acceso, para personas que todavia no tienen cuenta.
+router.get("/support-email", settingsController.getSupportEmail);
 
 // Solo un super administrador puede cambiarlo.
 router.put("/support-email", authenticateToken, requireSuperUser, settingsController.updateSupportEmail);

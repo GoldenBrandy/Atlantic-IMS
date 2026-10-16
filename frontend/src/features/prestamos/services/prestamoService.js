@@ -4,13 +4,19 @@ import { API_URL as BASE_API_URL } from "@/features/config";
 const API_URL = `${BASE_API_URL}/prestamos`;
 
 export async function getPrestamos() {
-  const response = await fetch(API_URL);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(API_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!response.ok) throw new Error("Error obteniendo los préstamos");
   return response.json();
 }
 
 export async function getPrestamoById(id) {
-  const response = await fetch(`${API_URL}/${id}`);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${API_URL}/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.error || "Préstamo no encontrado");

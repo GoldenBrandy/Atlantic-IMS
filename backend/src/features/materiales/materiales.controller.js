@@ -30,7 +30,7 @@ export const materialController = {
       });
     } catch (err) {
       console.error("ERROR BACKEND:", err);
-      res.status(500).json({ error: err.message });
+      res.status(err.statusCode ?? 500).json({ error: err.message, field: err.field });
     }
   },
 
@@ -43,7 +43,7 @@ export const materialController = {
       });
     } catch (err) {
       console.error("ERROR BACKEND:", err);
-      res.status(400).json({ error: err.message });
+      res.status(err.statusCode ?? 400).json({ error: err.message, field: err.field });
     }
   },
 

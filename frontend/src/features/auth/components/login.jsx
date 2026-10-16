@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Button, IconButton, bigLabelClass } from "@/shared";
 import { useNavigate } from "react-router-dom";
-import { MoveLeft, Eye, EyeOff } from "lucide-react";
+import { MoveLeft, Eye, EyeOff, Mail } from "lucide-react";
+import { getSupportEmail } from "@/features/settings/services/settingsService";
 
 // const API_URL = "http://localhost:4000/api/auth/login";
 import { API_URL as BASE_API_URL } from "@/features/config";
@@ -24,6 +25,11 @@ export default function Login({
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [supportEmail, setSupportEmail] = useState("");
+
+  useEffect(() => {
+    getSupportEmail().then(setSupportEmail).catch(console.error);
+  }, []);
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
@@ -98,7 +104,7 @@ export default function Login({
         onSubmit={handleSubmit}
         noValidate
       >
-        <div className="mx-auto grid w-full max-w-md gap-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mx-auto grid w-full max-w-md gap-6 rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
           <Input
             label="Correo"
             dense
@@ -156,6 +162,13 @@ export default function Login({
               ¿No tienes cuenta? Solicítala
             </button>
           </div>
+
+          {supportEmail && (
+            <p className="flex items-center justify-center gap-2 pt-2 text-caption text-black/60">
+              <Mail size={14} />
+              ¿Necesitas ayuda? Escribe a {supportEmail}
+            </p>
+          )}
         </div>
       </form>
     </section>;

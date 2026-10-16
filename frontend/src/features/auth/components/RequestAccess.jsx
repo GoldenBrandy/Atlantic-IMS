@@ -65,7 +65,7 @@ export default function RequestAccess({ backTo = "/auth" }) {
       </div>
 
       <form
-        className="mx-auto grid w-full max-w-md gap-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"
+        className="mx-auto grid w-full max-w-md gap-6 rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm"
         onSubmit={handleSubmit}
         noValidate
       >

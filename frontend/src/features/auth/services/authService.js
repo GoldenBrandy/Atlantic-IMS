@@ -21,6 +21,23 @@ export async function forgotPassword(userEmail) {
     return data;
 }
 
+//Verifica si el codigo de 8 digitos es correcto, sin cambiar la contraseña todavia (se usa antes de mostrar la pantalla para definir la nueva).
+export async function verifyResetCode({ userEmail, code }) {
+    const response = await fetch(`${AUTH_API_URL}/verify-reset-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail, code }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        const err = new Error(data.error || "El código no es válido");
+        err.field = data.field;
+        throw err;
+    }
+    return data;
+}
+
 //Verifica el código de 8 dígitos y define la nueva contraseña
 export async function resetPassword({ userEmail, code, newPassword }) {
     const response = await fetch(`${AUTH_API_URL}/reset-password`, {

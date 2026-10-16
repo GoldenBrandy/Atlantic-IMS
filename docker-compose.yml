@@ -29,7 +29,7 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: https://grupo3.ricoprogramar.com/api
+        VITE_API_URL: http://grupo3.ricoprogramar.com/api
     depends_on:
       - backend
     ports:

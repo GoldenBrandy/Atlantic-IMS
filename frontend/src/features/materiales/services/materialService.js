@@ -4,13 +4,19 @@ import { API_URL as BASE_API_URL } from "@/features/config";
 const API_URL = `${BASE_API_URL}/materiales`;
 
 export async function getMateriales() {
-  const response = await fetch(API_URL);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(API_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!response.ok) throw new Error("Error obteniendo los materiales");
   return response.json();
 }
 
 export async function getMaterialById(id) {
-  const response = await fetch(`${API_URL}/${id}`);
+  const token = sessionStorage.getItem("token");
+  const response = await fetch(`${API_URL}/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.error || "Material no encontrado");

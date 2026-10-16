@@ -8,7 +8,7 @@ import Button from "./Button";
 // referencia (usuarios, cuentadantes, responsables, firmas, etc.).
 export default function DataConsentCard({ purpose, given, onToggle, error }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+    <div className="rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
       <h2 className="mb-3 flex items-center gap-2 text-base font-semibold">
         <ShieldCheck size={18} className="text-(--primary-950)" />
         Autorización para el tratamiento de datos personales

@@ -46,6 +46,23 @@ export const devolucionService = {
       throw error;
     }
 
+    for (const material of materials) {
+      const raw = material.quantityReturned;
+      const quantity = raw === undefined || raw === null || raw === "" ? 0 : Number(raw);
+      if (!Number.isInteger(quantity) || quantity < 0) {
+        const error = new Error("La cantidad devuelta debe ser un numero entero mayor o igual a cero");
+        error.statusCode = 400;
+        error.field = "materials";
+        throw error;
+      }
+      if (typeof material.condition !== "string" || material.condition.trim() === "") {
+        const error = new Error("Debe indicar el estado de cada material devuelto");
+        error.statusCode = 400;
+        error.field = "materials";
+        throw error;
+      }
+    }
+
     return devolucionRepository.create(prestamoId, {
       returnedBy: toId(data.returnedBy),
       observation: data.observation || null,

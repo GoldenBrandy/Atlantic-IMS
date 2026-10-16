@@ -1,9 +1,25 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Login, isSuperUser, mustChangePassword } from "@/features/auth";
 
 export function RequireAuth({ children }) {
     const location = useLocation();
+    const navigate = useNavigate();
     const token = sessionStorage.getItem("token");
+
+    // Si el navegador restaura esta pagina desde su cache (bfcache) al usar
+    // las flechas atras/adelante despues de cerrar sesion, se vuelve a
+    // revisar si sigue habiendo token en vez de mostrar la version
+    // congelada que habia quedado autenticada.
+    useEffect(() => {
+        const handlePageShow = (event) => {
+            if (event.persisted && !sessionStorage.getItem("token")) {
+                navigate("/auth", { replace: true });
+            }
+        };
+        window.addEventListener("pageshow", handlePageShow);
+        return () => window.removeEventListener("pageshow", handlePageShow);
+    }, [navigate]);
 
     if (!token) {
         return <Navigate to="/auth" replace state={{ from: location.pathname }} />;

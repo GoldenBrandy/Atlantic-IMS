@@ -6,7 +6,7 @@ import { MoveLeft, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { sileo } from "sileo";
 import { forgotPasswordSchema } from "../schemas/forgotPasswordSchema";
 import { resetPasswordSchema } from "../schemas/resetPasswordSchema";
-import { forgotPassword, resetPassword } from "../services/authService";
+import { forgotPassword, verifyResetCode, resetPassword } from "../services/authService";
 
 const CODE_LENGTH = 8;
 //Tiempo de espera para poder pedir un nuevo código (cooldown visual del botón de reenvío), independiente de los 10 minutos que dura válido el código del backend.
@@ -137,14 +137,23 @@ export default function ForgotPassword({ backTo = "/auth" }) {
     }
   };
 
-  const handleContinueCode = (e) => {
+  const handleContinueCode = async (e) => {
     e.preventDefault();
     if (code.length !== CODE_LENGTH || /\D/.test(code)) {
       setErrors({ code: "Ingresa los 8 dígitos del código" });
       return;
     }
+
     setErrors({});
-    setStep("password");
+    setIsSubmitting(true);
+    try {
+      await verifyResetCode({ userEmail, code });
+      setStep("password");
+    } catch (err) {
+      setErrors({ code: err?.message || "El código no es válido" });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleResetPassword = async (e) => {
@@ -194,7 +203,7 @@ export default function ForgotPassword({ backTo = "/auth" }) {
         </IconButton>
       </div>
 
-      <div className="mx-auto grid w-full max-w-md gap-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mx-auto grid w-full max-w-md gap-6 rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm">
         {step === "email" && (
           <form className="grid gap-6" onSubmit={handleSendCode} noValidate>
             <div>
@@ -248,7 +257,7 @@ export default function ForgotPassword({ backTo = "/auth" }) {
             </p>
 
             <Button variant="primary" type="submit" disabled={isSubmitting}>
-              Continuar
+              {isSubmitting ? "Verificando..." : "Continuar"}
             </Button>
           </form>
         )}

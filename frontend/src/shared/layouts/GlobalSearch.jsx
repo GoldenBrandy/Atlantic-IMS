@@ -143,7 +143,7 @@ export default function GlobalSearch() {
   };
 
   return (
-    <div ref={containerRef} className="relative md:block w-full max-w-64 shrink-0" onFocus={() => { setIsOpen(true); loadAllData(); }}>
+    <div ref={containerRef} className="relative hidden md:block w-full max-w-64 shrink-0" onFocus={() => { setIsOpen(true); loadAllData(); }}>
       <SearchField
         value={query}
         onChange={handleChange}

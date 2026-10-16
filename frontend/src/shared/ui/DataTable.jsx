@@ -86,8 +86,9 @@ export default function DataTable({
     };
 
     const searchInputClasses = isClean
-        ? 'rounded-lg border border-neutral-300 px-3 py-2 w-64 text-sm focus:outline-none focus:border-(--primary-950) focus:ring-2 focus:ring-(--primary-950)/20'
-        : 'border rounded px-3 py-2 w-64';
+        ? 'rounded-lg border border-neutral-300 px-3 py-2 w-full sm:w-64 text-sm focus:outline-none focus:border-(--primary-950) focus:ring-2 focus:ring-(--primary-950)/20'
+        : 'border rounded px-3 py-2 w-full sm:w-64';
+
 
     const pageSizeSelectClasses = isClean
         ? 'rounded-lg border border-neutral-300 px-2 py-2 text-sm focus:outline-none focus:border-(--primary-950)'
@@ -120,7 +121,7 @@ export default function DataTable({
 
     return (
         <div className='space-y-4'>
-            <div className='flex items-center justify-between gap-4'>
+            <div className='flex flex-wrap items-center justify-between gap-4'>
                 <input type='text' placeholder='Buscar...' value={globalFilter ?? ""} onChange={(event) => setGlobalFilter(event.target.value)} className={searchInputClasses} />
                 <select value={table.getState().pagination.pageSize} onChange={(event) => table.setPageSize(Number(event.target.value))} className={pageSizeSelectClasses}>
                     {[5, 7, 10, 20, 50].map((size) => (
@@ -172,9 +173,9 @@ export default function DataTable({
                     </table>
                 </div>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className={footerTextClasses}>Mostrando {table.getRowModel().rows.length} de {table.getFilteredRowModel().rows.length} registros</span>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <Button size="sm" variant="secondary" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>Inicio</Button>
 
                     <Button size="sm" variant="secondary" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>Anterior</Button>

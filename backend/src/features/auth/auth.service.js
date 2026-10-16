@@ -13,6 +13,16 @@ const RESET_CODE_TIL_MINUTES = 10;
 const PASSWORD_COMPLEXITY_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
 
+function isResetCodeValid(user, code) {
+  return Boolean(
+    user &&
+      user.reset_code &&
+      user.reset_code === code &&
+      user.reset_code_expires_at &&
+      new Date(user.reset_code_expires_at).getTime() >= Date.now(),
+  );
+}
+
 export const authService = {
   async login({ userEmail, userPassword }) {
     if (!userEmail || !userPassword) {
@@ -90,6 +100,26 @@ export const authService = {
     };
   },
 
+  // Verifica si un codigo de 8 digitos es valido (existe y no vencio) para
+  // el correo dado, sin consumirlo ni cambiar nada. Se usa en la pantalla
+  // del codigo para avisar de inmediato si esta mal, en vez de esperar
+  // hasta que la persona ya escribio la contraseña nueva.
+  async verifyResetCode({ userEmail, code }) {
+    if (!userEmail || !code) {
+      throw new Error("Correo y código son obligatorios");
+    }
+
+    const user = await authRepository.findUserByEmail(userEmail);
+
+    if (!isResetCodeValid(user, code)) {
+      const error = new Error("El código es inválido o ya venció");
+      error.field = "code";
+      throw error;
+    }
+
+    return { valid: true };
+  },
+
   // Verifica el codigo de 8 digitos (y su vencimiento) y define la nueva
   // contrasena. También limpia must_change_password, ya que restablecer la
   // contrasena cumple el mismo propósito que el cambio obligatorio.
@@ -108,14 +138,7 @@ export const authService = {
 
     const user = await authRepository.findUserByEmail(userEmail);
 
-    const isCodeValid =
-      user &&
-      user.reset_code &&
-      user.reset_code === code &&
-      user.reset_code_expires_at &&
-      new Date(user.reset_code_expires_at).getTime() >= Date.now();
-
-    if (!isCodeValid) {
+    if (!isResetCodeValid(user, code)) {
       const error = new Error("El código es inválido o ya venció");
       error.field = "code";
       throw error;

@@ -28,9 +28,9 @@ export const prestamoSchema = z
     loanType: z.string().min(1, "Debe seleccionar un tipo de préstamo"),
     startDate: z.string().min(1, "Debe indicar la fecha de salida"),
     dueDate: z.string().min(1, "Debe indicar la fecha de entrega"),
-    signatureUrl: z
-      .string()
-      .min(1, "Debe adjuntar la firma digital para legalizar el préstamo"),
+    // Opcional: se puede firmar despues (editando el prestamo) sin que la
+    // persona tenga que estar presente al momento de crearlo.
+    signatureUrl: z.string().optional(),
   })
   .refine((data) => data.dueDate >= data.startDate, {
     message: "La fecha de entrega no puede ser anterior a la fecha de salida",

@@ -571,7 +571,7 @@ export default function MaterialRegisterForm({
     }
   };
 
-  const cardClass = "rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm";
+  const cardClass = "rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-2xl sm:border sm:border-neutral-200 sm:bg-white sm:p-6 sm:shadow-sm";
   const isLastStep = currentStep === steps.length - 1;
 
   return (
@@ -639,8 +639,7 @@ export default function MaterialRegisterForm({
 
                         {isDevolutivo && (
                           <Input
-                            label="Modelo"
-                            required
+                            label="Modelo (opcional)"
                             dense
                             labelClassName={bigLabelClass}
                             name="model"
@@ -678,23 +677,20 @@ export default function MaterialRegisterForm({
                           />
                         )}
 
-                        {isDevolutivo && (
-                          <Input
-                            label="Serial SN (opcional)"
-                            dense
-                            labelClassName={bigLabelClass}
-                            name="externalId"
-                            placeholder="Identificador interno"
-                            startAdornment={<Hash size={16} />}
-                            value={formData.externalId}
-                            onChange={handleChange}
-                            error={errors.externalId}
-                          />
-                        )}
+                        <Input
+                          label="Serial SN (opcional)"
+                          dense
+                          labelClassName={bigLabelClass}
+                          name="externalId"
+                          placeholder="Identificador interno"
+                          startAdornment={<Hash size={16} />}
+                          value={formData.externalId}
+                          onChange={handleChange}
+                          error={errors.externalId}
+                        />
 
                         <Select
-                          label="Marca"
-                          required
+                          label="Marca (opcional)"
                           dense
                           labelClassName={bigLabelClass}
                           name="marca"

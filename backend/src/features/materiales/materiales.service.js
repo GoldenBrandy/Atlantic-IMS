@@ -56,6 +56,29 @@ function mapPayload(data) {
   };
 }
 
+// Valida los datos obligatorios antes de tocar la base de datos, para
+// responder 400 (y no un 500 de PostgreSQL) ante datos invalidos.
+function validateMaterial(data) {
+  const fail = (message, field) => {
+    const error = new Error(message);
+    error.statusCode = 400;
+    error.field = field;
+    throw error;
+  };
+  if (typeof data?.name !== "string" || data.name.trim() === "") {
+    fail("El nombre del material es obligatorio", "name");
+  }
+  if (typeof data?.type !== "string" || data.type.trim() === "") {
+    fail("El tipo del material es obligatorio", "type");
+  }
+  if (data.quantity !== undefined && data.quantity !== null && data.quantity !== "") {
+    const quantity = Number(data.quantity);
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      fail("La cantidad debe ser un numero entero mayor o igual a cero", "quantity");
+    }
+  }
+}
+
 export const materialService = {
   async getAllMateriales() {
     return materialRepository.findAll();
@@ -68,10 +91,12 @@ export const materialService = {
   },
 
   async createMaterial(data) {
+    validateMaterial(data);
     return materialRepository.create(mapPayload(data));
   },
 
   async updateMaterial(id, data) {
+    validateMaterial(data);
     const updated = await materialRepository.update(id, mapPayload(data));
     if (!updated) throw new Error("Material no encontrado");
     return updated;

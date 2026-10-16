@@ -56,6 +56,15 @@ export const prestamoRepository = {
     return attachMaterials(result.rows[0] ?? null);
   },
 
+  // Estado actual de los materiales indicados (para validar antes de prestar).
+  async findMaterialsByIds(ids) {
+    const result = await pool.query(
+      `SELECT id, name, type, quantity, is_active FROM materiales WHERE id = ANY($1::int[]);`,
+      [ids],
+    );
+    return result.rows;
+  },
+
   async create(data) {
     const {
       materialIds,
