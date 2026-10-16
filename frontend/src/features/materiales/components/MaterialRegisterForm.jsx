@@ -648,7 +648,7 @@ export default function MaterialRegisterForm({
                         />
 
 
-                        <div className="flex items-end gap-2">
+                        <div className="flex items-end gap-2 self-start">
                           <div className="flex-1">
                             <Select
                               label="Inventario (opcional)"
