@@ -10,7 +10,7 @@ import {
   IconButton,
 } from "@/shared";
 import { formatUserName } from "@/features/users/services/userService";
-import { PRODUCT_TYPE_OPTIONS, CATEGORY_OPTIONS } from "../services/productoOptionsService";
+import { PRODUCT_TYPE_OPTIONS } from "../services/productoOptionsService";
 
 function findLabel(options, id) {
   return options.find((option) => option.id === id)?.label ?? id;
@@ -70,7 +70,7 @@ export default function ProductoRowActions({ producto, users = [] }) {
           { label: "Nombre", value: producto.name },
           { label: "Código de producto", value: producto.product_code },
           { label: "Tipo", value: findLabel(PRODUCT_TYPE_OPTIONS, producto.type) },
-          { label: "Categoría", value: findLabel(CATEGORY_OPTIONS, producto.category) },
+          { label: "Categoría", value: producto.categoria_name },
           { label: "Responsable", value: findUserName(users, producto.responsible) },
           { label: "Estado", value: producto.status === "activo" ? "Activo" : "Inactivo" },
           { label: "Último movimiento", value: producto.last_movement },

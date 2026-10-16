@@ -6,6 +6,8 @@ const ACCESS_API_URL = `${API_URL}/access`;
 
 export async function hasPermission(permissionCode) {
   const token = sessionStorage.getItem("token");
+  if (!token) return false;
+
   const response = await fetch(`${ACCESS_API_URL}/check/${permissionCode}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -16,5 +18,6 @@ export async function hasPermission(permissionCode) {
     throw new Error("Error verificando permisos");
   }
 
-  return response.json();
+  const data = await response.json();
+  return data.granted === true;
 }

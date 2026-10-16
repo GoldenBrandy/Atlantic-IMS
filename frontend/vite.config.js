@@ -15,4 +15,10 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  server: {
+    // Permite que el servidor de desarrollo acepte peticiones que llegan a
+    // traves de un tunel de cloudflared (dominio *.trycloudflare.com), para
+    // poder compartir el proyecto local sin tener que desplegarlo.
+    allowedHosts: ['.trycloudflare.com'],
+  },
 })

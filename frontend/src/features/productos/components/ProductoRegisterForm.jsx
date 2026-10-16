@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { productoSchema } from "../schemas/productoSchema";
 import { createProducto, updateProducto, getProductoById } from "../services/productoService";
-import { getProductTypeOptions, getCategoryOptions } from "../services/productoOptionsService";
+import { getProductTypeOptions } from "../services/productoOptionsService";
+import { getCategorias } from "@/features/categorias/services/categoriaService";
 import { getUsers, formatUserName } from "@/features/users/services/userService";
 import { Input, Button, Select, IconButton, StepIndicator, bigLabelClass } from "@/shared";
 import { useNavigate } from "react-router-dom";
@@ -43,12 +44,17 @@ export default function ProductoRegisterForm({
   const [currentStep, setCurrentStep] = useState(0);
 
   const [typeOptions, setTypeOptions] = useState([{ id: "", label: "Selecciona tipo" }]);
-  const [categoryOptions, setCategoryOptions] = useState([{ id: "", label: "Selecciona categoria" }]);
+  const [categorias, setCategorias] = useState([]);
 
   useEffect(() => {
     getProductTypeOptions().then((data) => setTypeOptions((prev) => [prev[0], ...data]));
-    getCategoryOptions().then((data) => setCategoryOptions((prev) => [prev[0], ...data]));
+    getCategorias().then(setCategorias).catch(console.error);
   }, []);
+
+  const categoryOptions = useMemo(
+    () => [{ id: "", label: "Selecciona categoria" }, ...categorias.map((cat) => ({ id: String(cat.id), label: cat.name }))],
+    [categorias],
+  );
 
   const [users, setUsers] = useState([]);
 
@@ -84,7 +90,7 @@ export default function ProductoRegisterForm({
         setFormData({
           name: producto.name ?? "",
           type: producto.type ?? "",
-          category: producto.category ?? "",
+          category: producto.categoria_id ? String(producto.categoria_id) : "",
           responsible: producto.responsible ? String(producto.responsible) : "",
           location: producto.location ?? "",
           quantity: producto.quantity ?? "",

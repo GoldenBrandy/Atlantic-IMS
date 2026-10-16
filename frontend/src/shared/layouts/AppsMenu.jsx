@@ -15,6 +15,8 @@ import {
   HandCoins,
   History,
   Boxes,
+  Shapes,
+  FileSpreadsheet,
 } from "lucide-react";
 import { isSuperUser } from "@/features/auth";
 import { IconButton } from "../ui/IconButton";
@@ -31,6 +33,8 @@ const MODULES = [
   { label: "Grupos", to: "/dashboard/grupos", icon: UsersRound, iconBg: "bg-purple-100", iconColor: "text-purple-600" },
   { label: "Productos", to: "/dashboard/productos", icon: ShoppingBag, iconBg: "bg-rose-100", iconColor: "text-rose-600" },
   { label: "Marcas", to: "/dashboard/marcas", icon: Tag, iconBg: "bg-pink-100", iconColor: "text-pink-600" },
+  { label: "Categorías", to: "/dashboard/categorias", icon: Shapes, iconBg: "bg-cyan-100", iconColor: "text-cyan-600" },
+  { label: "Cotizaciones", to: "/dashboard/cotizaciones", icon: FileSpreadsheet, iconBg: "bg-fuchsia-100", iconColor: "text-fuchsia-600" },
   { label: "Tareas", to: "/dashboard/tareas", icon: ClipboardList, iconBg: "bg-teal-100", iconColor: "text-teal-600" },
   { label: "Reportes", to: "/dashboard/reportes", icon: FileBarChart, iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
   { label: "Préstamos", to: "/dashboard/prestamos", icon: HandCoins, iconBg: "bg-violet-100", iconColor: "text-violet-600" },

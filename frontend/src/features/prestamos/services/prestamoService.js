@@ -62,6 +62,38 @@ export async function updatePrestamo(id, prestamoData) {
   return response.json();
 }
 
+// Publicas (sin token): la persona llega desde el link del correo, puede no
+// tener cuenta en el sistema (ej. solicitante externo).
+export async function confirmPrestamoIdentity(id, role, code) {
+  const response = await fetch(`${API_URL}/${id}/confirm-identity`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role, code }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.error || "No se pudo confirmar la identidad");
+    error.field = data.field;
+    throw error;
+  }
+  return data;
+}
+
+export async function resendPrestamoIdentityCode(id, role) {
+  const response = await fetch(`${API_URL}/${id}/resend-identity-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || "No se pudo reenviar el código");
+  }
+  return data;
+}
+
 export async function returnPrestamo(id) {
   const token = sessionStorage.getItem("token");
   const response = await fetch(`${API_URL}/${id}/return`, {

@@ -1,6 +1,5 @@
 import { Switch } from "@/shared";
 import MaterialRowActions from "../components/MaterialRowActions";
-import { MATERIAL_CATEGORY_OPTIONS } from "../services/materialTypeService";
 import { formatUserName } from "@/features/users/services/userService";
 
 const currencyFormatter = new Intl.NumberFormat("es-CO", {
@@ -8,11 +7,6 @@ const currencyFormatter = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 2,
 });
-
-function findCategoryLabel(id) {
-  if (!id) return "-";
-  return MATERIAL_CATEGORY_OPTIONS.find((option) => option.id === id)?.label ?? id;
-}
 
 function muted(value) {
   return value === null || value === undefined || value === "" ? <span className="text-neutral-400">-</span> : value;
@@ -49,7 +43,7 @@ export function getMaterialColumns(onToggleStatus, users = []) {
     {
       id: "category",
       header: "Categoría",
-      cell: ({ row }) => findCategoryLabel(row.original.category),
+      cell: ({ row }) => muted(row.original.categoria_name),
     },
     {
       id: "model",
@@ -94,6 +88,11 @@ export function getMaterialColumns(onToggleStatus, users = []) {
       id: "purchase_date",
       header: "Fecha compra",
       cell: ({ row }) => muted(row.original.purchase_date ? String(row.original.purchase_date).slice(0, 10) : null),
+    },
+    {
+      id: "entry_date",
+      header: "Fecha ingreso",
+      cell: ({ row }) => muted(row.original.entry_date ? String(row.original.entry_date).slice(0, 10) : null),
     },
     {
       id: "unit_value",

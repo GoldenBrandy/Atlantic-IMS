@@ -77,20 +77,23 @@ export const prestamoRepository = {
       startDate,
       dueDate,
       signatureUrl,
-      requesterIdentityConfirmed,
-      lenderIdentityConfirmed,
     } = data;
 
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
 
+      // requester_identity_confirmed / lender_identity_confirmed NO se
+      // reciben del cliente: quedan en su default (false) y solo cambian
+      // via confirmRequesterIdentity/confirmLenderIdentity, despues de
+      // validar el codigo enviado por correo. Si el cliente pudiera
+      // mandarlas, se saltaria toda la verificacion.
       const insertResult = await client.query(
         `INSERT INTO prestamos (
            requesting_user, lending_user, ficha, requester_email,
-           justification, loan_type, start_date, due_date, signature_url, requester_identity_confirmed, lender_identity_confirmed
+           justification, loan_type, start_date, due_date, signature_url
          )
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
          RETURNING id;`,
         [
           requestingUser || null,
@@ -102,8 +105,6 @@ export const prestamoRepository = {
           startDate || null,
           dueDate || null,
           signatureUrl || null,
-          Boolean(requesterIdentityConfirmed),
-          Boolean(lenderIdentityConfirmed),
         ],
       );
       const prestamoId = insertResult.rows[0].id;
@@ -137,25 +138,27 @@ export const prestamoRepository = {
       startDate,
       dueDate,
       signatureUrl,
-      requesterIdentityConfirmed,
-      lenderIdentityConfirmed,
     } = data;
 
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
 
-      // La firma solo se sobreescribe si llega una nueva; de lo contrario se conserva la existente.
+      // La firma solo se sobreescribe si llega una nueva; de lo contrario se
+      // conserva la existente. requester_identity_confirmed /
+      // lender_identity_confirmed NO se tocan aqui a proposito: editar un
+      // prestamo (ej. cambiar fechas) no debe resetear una confirmacion de
+      // identidad ya validada por correo.
       const query = signatureUrl
         ? `UPDATE prestamos SET
              requesting_user = $1, lending_user = $2, ficha = $3, requester_email = $4,
-             justification = $5, loan_type = $6, start_date = $7, due_date = $8, signature_url = $9, requester_identity_confirmed = $10, lender_identity_confirmed = $11
-           WHERE id = $12
+             justification = $5, loan_type = $6, start_date = $7, due_date = $8, signature_url = $9
+           WHERE id = $10
            RETURNING id;`
         : `UPDATE prestamos SET
              requesting_user = $1, lending_user = $2, ficha = $3, requester_email = $4,
-             justification = $5, loan_type = $6, start_date = $7, due_date = $8, requester_identity_confirmed = $9, lender_identity_confirmed = $10
-           WHERE id = $11
+             justification = $5, loan_type = $6, start_date = $7, due_date = $8
+           WHERE id = $9
            RETURNING id;`;
 
       const values = signatureUrl
@@ -169,8 +172,6 @@ export const prestamoRepository = {
             startDate || null,
             dueDate || null,
             signatureUrl,
-            Boolean(requesterIdentityConfirmed),
-            Boolean(lenderIdentityConfirmed),
             id,
           ]
         : [
@@ -182,8 +183,6 @@ export const prestamoRepository = {
             loanType,
             startDate || null,
             dueDate || null,
-            Boolean(requesterIdentityConfirmed),
-            Boolean(lenderIdentityConfirmed),
             id,
           ];
 
@@ -219,6 +218,61 @@ export const prestamoRepository = {
     const result = await pool.query(
       `UPDATE prestamos SET returned_at = NOW() WHERE id = $1 RETURNING id;`,
       [id],
+    );
+    return result.rows[0] ?? null;
+  },
+
+  // Correo/nombre de un usuario registrado, para mandarle el codigo de
+  // confirmacion de identidad (solicitante o prestador con cuenta).
+  async getUserContact(userId) {
+    if (!userId) return null;
+    const result = await pool.query(
+      `SELECT user_email, user_name FROM users WHERE id = $1;`,
+      [userId],
+    );
+    return result.rows[0] ?? null;
+  },
+
+  async setRequesterOtp(prestamoId, code, expiresAt) {
+    await pool.query(
+      `UPDATE prestamos SET requester_otp_code = $1, requester_otp_expires_at = $2 WHERE id = $3;`,
+      [code, expiresAt, prestamoId],
+    );
+  },
+
+  async setLenderOtp(prestamoId, code, expiresAt) {
+    await pool.query(
+      `UPDATE prestamos SET lender_otp_code = $1, lender_otp_expires_at = $2 WHERE id = $3;`,
+      [code, expiresAt, prestamoId],
+    );
+  },
+
+  async getIdentityState(prestamoId) {
+    const result = await pool.query(
+      `SELECT requester_otp_code, requester_otp_expires_at, requester_identity_confirmed,
+              lender_otp_code, lender_otp_expires_at, lender_identity_confirmed
+       FROM prestamos WHERE id = $1;`,
+      [prestamoId],
+    );
+    return result.rows[0] ?? null;
+  },
+
+  async confirmRequesterIdentity(prestamoId) {
+    const result = await pool.query(
+      `UPDATE prestamos
+       SET requester_identity_confirmed = true, requester_otp_code = NULL, requester_otp_expires_at = NULL
+       WHERE id = $1 RETURNING id;`,
+      [prestamoId],
+    );
+    return result.rows[0] ?? null;
+  },
+
+  async confirmLenderIdentity(prestamoId) {
+    const result = await pool.query(
+      `UPDATE prestamos
+       SET lender_identity_confirmed = true, lender_otp_code = NULL, lender_otp_expires_at = NULL
+       WHERE id = $1 RETURNING id;`,
+      [prestamoId],
     );
     return result.rows[0] ?? null;
   },

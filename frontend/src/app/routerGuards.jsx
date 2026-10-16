@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Login, isSuperUser, mustChangePassword } from "@/features/auth";
+import { hasPermission } from "@/features/access/services/accessService";
+import { AccessDeniedModal } from "@/shared";
 
 export function RequireAuth({ children }) {
     const location = useLocation();
@@ -41,6 +43,40 @@ export function RequireAuth({ children }) {
 export function RequireSuperUser({ children }) {
     if (!isSuperUser()) {
         return <Navigate to="/dashboard" replace />;
+    }
+
+    return children;
+}
+
+// Bloquea por completo el contenido (no solo lo oculta) hasta confirmar con
+// el backend que el usuario tiene el permiso indicado. Si no lo tiene, nunca
+// llega a montar `children`: muestra el popup de acceso denegado y, al
+// cerrarlo, regresa al dashboard reemplazando el historial.
+export function RequirePermission({ permission, children }) {
+    const navigate = useNavigate();
+    const [status, setStatus] = useState("checking"); // checking | granted | denied
+
+    useEffect(() => {
+        let active = true;
+        setStatus("checking");
+
+        hasPermission(permission)
+            .then((granted) => {
+                if (active) setStatus(granted ? "granted" : "denied");
+            })
+            .catch(() => {
+                if (active) setStatus("denied");
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [permission]);
+
+    if (status === "checking") return null;
+
+    if (status === "denied") {
+        return <AccessDeniedModal onClose={() => navigate("/dashboard", { replace: true })} />;
     }
 
     return children;

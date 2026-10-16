@@ -30,15 +30,8 @@ function mapPayload(data) {
     technicalSheetUrls: Array.isArray(data.technicalSheetUrls)
       ? data.technicalSheetUrls.filter(Boolean)
       : [],
-    quotations: Array.isArray(data.quotations)
-      ? data.quotations
-          .filter((q) => q?.url)
-          .map((q) => ({
-            url: q.url,
-            value:
-              q.value !== undefined && q.value !== "" ? Number(q.value) : null,
-            date: q.date || null,
-          }))
+    cotizacionIds: Array.isArray(data.cotizacionIds)
+      ? data.cotizacionIds.map(toId).filter((id) => id !== null)
       : [],
     senaPlate: data.senaPlate ?? null,
     marcaId: toId(data.marcaId ?? data.marca),
@@ -48,10 +41,11 @@ function mapPayload(data) {
     inventarioId: toId(data.inventarioId ?? data.inventario),
     location: data.location ?? null,
     purchaseDate: data.purchaseDate || null,
+    entryDate: data.entryDate || null,
     unitValue,
     totalValue,
     model: data.model ?? null,
-    category: data.category ?? null,
+    categoriaId: toId(data.categoriaId ?? data.category),
     externalId: data.externalId ?? null,
   };
 }

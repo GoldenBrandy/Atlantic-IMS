@@ -10,4 +10,10 @@ router.get(
     accessController.testPermission
 );
 
+router.get(
+    '/check/:code',
+    authenticateToken,
+    accessController.checkPermission
+);
+
 export default router;

@@ -13,6 +13,7 @@ export { default as SearchField } from './SearchField';
 export { default as DataTable } from './DataTable';
 export { Dropdown, DropdownTrigger, DropdownContent, DropdownItem } from './Dropdown';
 export { default as ViewDetailsModal } from './ViewDetailsModal';
+export { default as AccessDeniedModal } from './AccessDeniedModal';
 export { default as SectionHeader } from './SectionHeader';
 export { default as MultiSelectField } from './MultiSelectField';
 export { default as DataConsentCard } from './DataConsentCard';

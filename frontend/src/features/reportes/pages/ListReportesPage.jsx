@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ReportConfigModal } from "@/shared";
-import { FileText, Users, Package, ShoppingBag, Tag, UsersRound, ClipboardList, HandCoins, History, Boxes, Loader2 } from "lucide-react";
+import { FileText, Users, Package, ShoppingBag, Tag, Shapes, FileSpreadsheet, UsersRound, ClipboardList, HandCoins, History, Boxes, Loader2 } from "lucide-react";
 import { sileo } from "sileo";
 import { isSuperUser } from "@/features/auth";
 
@@ -12,6 +12,10 @@ import { getProductos } from "@/features/productos/services/productoService";
 import { PRODUCTO_REPORT_FIELDS } from "@/features/productos/reports/productoReportFields";
 import { getMarcas } from "@/features/marcas/services/marcaService";
 import { MARCA_REPORT_FIELDS } from "@/features/marcas/reports/marcaReportFields";
+import { getCategorias } from "@/features/categorias/services/categoriaService";
+import { CATEGORIA_REPORT_FIELDS } from "@/features/categorias/reports/categoriaReportFields";
+import { getCotizaciones } from "@/features/cotizaciones/services/cotizacionService";
+import { COTIZACION_REPORT_FIELDS } from "@/features/cotizaciones/reports/cotizacionReportFields";
 import { getGrupos } from "@/features/grupos/services/grupoService";
 import { GRUPO_REPORT_FIELDS } from "@/features/grupos/reports/grupoReportFields";
 import { getTareas } from "@/features/tareas/services/tareaService";
@@ -61,6 +65,24 @@ const REPORT_MODULES = [
     fields: MARCA_REPORT_FIELDS,
     title: "Reporte de marcas",
     fileNamePrefix: "marcas",
+  },
+  {
+    key: "categorias",
+    label: "Categorías",
+    icon: Shapes,
+    fetch: getCategorias,
+    fields: CATEGORIA_REPORT_FIELDS,
+    title: "Reporte de categorías",
+    fileNamePrefix: "categorias",
+  },
+  {
+    key: "cotizaciones",
+    label: "Cotizaciones",
+    icon: FileSpreadsheet,
+    fetch: getCotizaciones,
+    fields: COTIZACION_REPORT_FIELDS,
+    title: "Reporte de cotizaciones",
+    fileNamePrefix: "cotizaciones",
   },
   {
     key: "grupos",

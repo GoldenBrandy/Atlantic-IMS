@@ -19,18 +19,9 @@ export const materialSchema = z
     materialImages: z.array(z.string()).optional(),
     // Campos que aplican (y se exigen segun el tipo) para consumo y devolutivo.
     technicalSheetImages: z.array(z.string()).optional(),
-    // Cotizaciones en PDF: obligatorias (1 a 3) para consumo y devolutivo.
-    // Cada una lleva ademas su valor y su fecha (para el promedio de las
-    // cotizaciones vigentes, <=90 dias).
-    quotations: z
-      .array(
-        z.object({
-          url: z.string().min(1),
-          value: z.union([z.string(), z.number()]).optional(),
-          date: z.string().optional(),
-        }),
-      )
-      .optional(),
+    // Cotizaciones: ids de cotizaciones ya guardadas en el modulo de
+    // Cotizaciones (obligatorio seleccionar 1 a 3 para consumo y devolutivo).
+    cotizacionIds: z.array(z.string()).optional(),
     senaPlate: z
       .string()
       .max(50, "La placa SENA es demasiado larga")
@@ -40,6 +31,7 @@ export const materialSchema = z
     inventario: z.string().optional(),
     location: z.string().max(150, "La ubicación es demasiado larga").optional(),
     purchaseDate: z.string().optional(),
+    entryDate: z.string().optional(),
     unitValue: z.union([z.string(), z.number()]).optional(),
     model: z.string().max(100, "El modelo es demasiado largo").optional(),
     category: z.string().optional(),
@@ -64,25 +56,11 @@ export const materialSchema = z
         message: "Debe indicar la fecha de compra",
       });
     }
-    if (!data.quotations || data.quotations.length === 0) {
+    if (!data.cotizacionIds || data.cotizacionIds.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["quotations"],
-        message: "Debe adjuntar al menos una cotización en PDF",
-      });
-    } else if (
-      data.quotations.some(
-        (q) =>
-          q.value === undefined ||
-          q.value === "" ||
-          Number.isNaN(Number(q.value)) ||
-          !q.date,
-      )
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["quotations"],
-        message: "Cada cotización debe tener su valor y su fecha",
+        path: ["cotizacionIds"],
+        message: "Debe seleccionar al menos una cotización",
       });
     }
     if (

@@ -9,18 +9,6 @@ export const prestamoSchema = z
     requesterEmail: z.string().optional(),
     lendingUser: z.string().optional(),
     ficha: z.string().optional(),
-    requesterIdentityConfirmed: z
-      .boolean()
-      .refine(
-        (value) => value === true,
-        "Debe confirmarse la identidad del usuario solicitante",
-      ),
-    lenderIdentityConfirmed: z
-      .boolean()
-      .refine(
-        (value) => value === true,
-        "Debe confirmarse la identidad del usuario prestador",
-      ),
     justification: z
       .string()
       .min(5, "La justificación debe tener al menos 5 caracteres")

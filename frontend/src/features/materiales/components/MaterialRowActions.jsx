@@ -9,7 +9,6 @@ import {
   ViewDetailsModal,
   IconButton,
 } from "@/shared";
-import { MATERIAL_CATEGORY_OPTIONS } from "../services/materialTypeService";
 import { formatUserName } from "@/features/users/services/userService";
 
 const currencyFormatter = new Intl.NumberFormat("es-CO", {
@@ -17,11 +16,6 @@ const currencyFormatter = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 2,
 });
-
-function findCategoryLabel(id) {
-  if (!id) return null;
-  return MATERIAL_CATEGORY_OPTIONS.find((option) => option.id === id)?.label ?? id;
-}
 
 // Traduce ids de cuentadantes a nombres, usando la lista de usuarios ya cargada.
 function findCustodianNames(custodianIds, users) {
@@ -111,17 +105,16 @@ export default function MaterialRowActions({ material, users = [] }) {
                 },
                 {
                   label: "Cotizaciones",
-                  value: material.quotations?.length ? (
+                  value: material.cotizaciones?.length ? (
                     <div className="flex flex-col gap-1">
-                      {material.quotations.map((quotation, index) => (
-                        <div key={index} className="flex flex-wrap items-center gap-2">
-                          <a href={quotation.url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
-                            Ver cotización {index + 1}
+                      {material.cotizaciones.map((cotizacion) => (
+                        <div key={cotizacion.id} className="flex flex-wrap items-center gap-2">
+                          <a href={cotizacion.file_url} target="_blank" rel="noreferrer" className="text-caption text-blue-600 underline">
+                            {cotizacion.name}
                           </a>
-                          {quotation.value != null && (
-                            <span className="text-caption text-neutral-600">{currencyFormatter.format(quotation.value)}</span>
+                          {cotizacion.quotation_date && (
+                            <span className="text-caption text-neutral-600">{String(cotizacion.quotation_date).slice(0, 10)}</span>
                           )}
-                          {quotation.date && <span className="text-caption text-neutral-600">{quotation.date}</span>}
                         </div>
                       ))}
                     </div>
@@ -132,6 +125,7 @@ export default function MaterialRowActions({ material, users = [] }) {
                 { label: "Inventario", value: material.inventario_name },
                 { label: "Ubicación", value: material.location },
                 { label: "Fecha compra", value: material.purchase_date ? String(material.purchase_date).slice(0, 10) : null },
+                { label: "Fecha ingreso", value: material.entry_date ? String(material.entry_date).slice(0, 10) : null },
                 { label: "Valor unitario", value: material.unit_value ? currencyFormatter.format(material.unit_value) : null },
                 { label: "Valor Total", value: material.total_value ? currencyFormatter.format(material.total_value) : null },
               ]
@@ -140,7 +134,7 @@ export default function MaterialRowActions({ material, users = [] }) {
           ...(isDevolutivo
             ? [
                 { label: "Modelo", value: material.model },
-                { label: "Categoría", value: findCategoryLabel(material.category) },
+                { label: "Categoría", value: material.categoria_name },
                 { label: "ID", value: material.external_id },
               ]
             : []),
